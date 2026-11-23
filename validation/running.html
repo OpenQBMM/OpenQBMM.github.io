@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<script src="../copy.js" defer></script>
+<title>Running the tests · OpenQBMM</title>
+<link rel="stylesheet" href="../industry.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --mono: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  body { margin: 0; background: var(--color-bg, #f2f2f3); color: var(--color-text, #1d1f20); font-family: var(--font-body, sans-serif); }
+  a { color: var(--color-accent-700); text-decoration: none; }
+  a:hover { color: var(--color-accent-900); }
+  .page { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
+  .kicker { margin: 0 0 18px; font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--color-accent-700); }
+  .label { margin: 0 0 12px; font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--color-neutral-700); }
+  h1 { margin: 0; font-family: var(--font-heading); font-weight: 700; font-size: clamp(40px, 5.5vw, 66px); line-height: .96; letter-spacing: -.01em; }
+  h2 { margin: 0; font-family: var(--font-heading); font-size: 30px; }
+  h3 { margin: 28px 0 0; font-family: var(--font-heading); font-size: 21px; }
+  .lead { margin: 22px 0 0; max-width: 62ch; font-size: 17px; line-height: 1.55; color: var(--color-neutral-800); }
+  .hero { padding: 56px 0 40px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, .7fr); gap: 48px; align-items: end; }
+  .box { border: 1px solid var(--color-divider); padding: 20px; }
+  .box ul { margin: 0; padding-left: 18px; font-size: 14px; line-height: 1.9; color: var(--color-neutral-800); }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 0; padding: 16px 0; list-style: none; border-top: 1px solid var(--color-divider); border-bottom: 1px solid var(--color-divider); font-size: 14px; }
+  .toc span { font-family: var(--mono); font-size: 11px; color: var(--color-neutral-600); margin-right: 6px; }
+  .step { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 24px; padding: 36px 0; border-bottom: 1px solid var(--color-divider); }
+  .step > .num { font-family: var(--mono); font-size: 12px; color: var(--color-accent-700); padding-top: 8px; }
+  .step p, .step li { max-width: 70ch; font-size: 15px; line-height: 1.6; color: var(--color-neutral-800); }
+  .step p { margin: 10px 0 0; }
+  .step ul { margin: 10px 0 0; padding-left: 20px; }
+  .step li + li { margin-top: 4px; }
+  code { font-family: var(--mono); font-size: 13px; overflow-wrap: anywhere; }
+  pre { margin: 14px 0 0; border: 1px solid var(--color-divider); background: var(--color-code-bg); color: var(--color-code-fg); padding: 14px 16px; font-family: var(--mono); font-size: 13px; line-height: 1.8; overflow-x: auto; }
+  pre .c { color: var(--color-code-comment); }
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px; margin-top: 22px; }
+  .card { position: relative; }
+  .card p.card-body { margin-top: 8px; }
+  .corner { position: absolute; width: 9px; height: 9px; }
+  .corner::before, .corner::after { content: ""; position: absolute; background: var(--color-accent); }
+  .corner::before { left: 4px; top: 0; width: 1px; height: 9px; }
+  .corner::after { top: 4px; left: 0; height: 1px; width: 9px; }
+  .corner.tl { left: -5px; top: -5px; } .corner.tr { right: -5px; top: -5px; }
+  .corner.bl { left: -5px; bottom: -5px; } .corner.br { right: -5px; bottom: -5px; }
+  .scroll { overflow-x: auto; margin-top: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  th { text-align: left; padding: 10px 16px 10px 0; font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--color-neutral-700); border-bottom: 1px solid var(--color-divider); }
+  td { padding: 12px 16px 12px 0; border-bottom: 1px solid var(--color-divider); vertical-align: top; line-height: 1.5; color: var(--color-neutral-800); }
+  td:first-child { font-family: var(--mono); font-size: 13px; color: var(--color-text); white-space: nowrap; }
+  .note { margin-top: 16px; border-left: 2px solid var(--color-accent); padding: 4px 0 4px 16px; }
+  footer { margin-top: 80px; padding-top: 24px; border-top: 1px solid var(--color-divider); display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; font-size: 13px; color: var(--color-neutral-700); }
+  @media (max-width: 720px) {
+    .hero { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+    .step { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+    .step > .num { padding-top: 0; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div role="note" style="margin:12px 0 0;padding:8px 12px;border:1px solid var(--color-divider);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.08em;color:var(--color-accent-700)">PREVIEW of the site of OpenQBMM 18, not the release. The validation results are those of development runs.</div>
+
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px 0;border-bottom:1px solid var(--color-divider);flex-wrap:wrap">
+    <a href="../index.html" style="display:flex;align-items:baseline;gap:8px;color:var(--color-text)">
+      <svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true" style="align-self:center;flex:none"><line x1="6" y1="56.5" x2="58" y2="56.5" stroke="var(--color-accent-800)" stroke-width="2.4" stroke-linecap="round"/><g stroke="var(--color-accent-800)" stroke-width="3.2" stroke-linecap="round"><line x1="15" y1="56.5" x2="15" y2="38.35"/><line x1="26" y1="56.5" x2="26" y2="14.15"/><line x1="38" y1="56.5" x2="38" y2="18.92"/><line x1="50" y1="56.5" x2="50" y2="41.68"/></g><path d="M6 54 C 15 54, 17 14, 29 13 S 45 42, 58 51" fill="none" stroke="var(--color-accent-600)" stroke-width="3.2" stroke-linecap="round"/><g fill="var(--color-accent-800)"><circle cx="15" cy="38.35" r="4.2"/><circle cx="26" cy="14.15" r="4.2"/><circle cx="38" cy="18.92" r="4.2"/><circle cx="50" cy="41.68" r="4.2"/></g></svg><span style="font-family:var(--font-body);font-size:25px;line-height:1;color:var(--color-accent-800)"><span style="font-weight:400">Open</span><span style="font-weight:600">QBMM</span></span>
+      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.12em;color:var(--color-accent-700)">v18.0</span>
+    </a>
+    <nav style="display:flex;gap:22px;align-items:center;font-size:14px;flex-wrap:wrap">
+      <a href="../index.html#capabilities">Features</a>
+      <a href="../applications.html">Applications</a>
+      <a href="../installation.html">Installation</a>
+      <a href="index.html" style="color:var(--color-accent-900);border-bottom:2px solid var(--color-accent);padding-bottom:2px">Validation</a>
+      <a href="../funding.html">Funding</a>
+      <a href="../contributors.html">Contributors</a>
+      <a href="../references.html">References</a>
+      <a class="btn btn-primary" href="https://github.com/OpenQBMM/OpenQBMM" style="font-size:13px;padding:7px 14px">GitHub</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div>
+      <p class="kicker"><a href="index.html">Validation</a> · OpenQBMM 18</p>
+      <h1>Running the tests and the validation</h1>
+      <p class="lead">How the results on the <a href="index.html">validation page</a> are
+      produced, and how to reproduce them on your own build: the unit tests, the cases with
+      their baselines and their reference data, and the tiers that run them together. Every
+      command on this page is run from the top of the OpenQBMM sources, in a shell with the
+      OpenFOAM environment loaded.</p>
+    </div>
+    <div class="box">
+      <p class="label">Requirements</p>
+      <ul>
+        <li>OpenQBMM built, as in the <a href="../installation.html">installation guide</a></li>
+        <li>The whole tree: a <a href="../installation.html#sparse">sparse clone</a> made for a build has to add <code>test</code> and <code>validation</code></li>
+        <li>The unit tests built (<a href="#unit-tests">below</a>)</li>
+        <li>Python 3, with matplotlib for the figures and the report</li>
+      </ul>
+    </div>
+  </section>
+
+  <ul class="toc">
+    <li><span>01</span><a href="#what">What is checked</a></li>
+    <li><span>02</span><a href="#unit-tests">Unit tests</a></li>
+    <li><span>03</span><a href="#cases">Running a case</a></li>
+    <li><span>04</span><a href="#baselines">Baselines</a></li>
+    <li><span>05</span><a href="#reference">Reference data</a></li>
+    <li><span>06</span><a href="#tiers">Tiers</a></li>
+    <li><span>07</span><a href="#report">The validation page</a></li>
+    <li><span>08</span><a href="#adding">Adding a test or a case</a></li>
+  </ul>
+
+  <section class="step" id="what">
+    <span class="num">01</span>
+    <div>
+      <h2>What is checked</h2>
+      <p>OpenQBMM is checked at three levels, which answer different questions.</p>
+      <div class="cards">
+        <div class="card">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <p class="card-kicker">Unit tests</p>
+          <h3 class="card-title" style="font-size:21px;margin:0">The algorithms</h3>
+          <p class="card-body" style="font-size:14px">Moment sets, moment inversion, advection
+          schemes and sub-models, each tested on its own by a small program that compares
+          what it computes with a known answer and exits with an error when they differ.</p>
+        </div>
+        <div class="card">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <p class="card-kicker">Baselines</p>
+          <h3 class="card-title" style="font-size:21px;margin:0">The software</h3>
+          <p class="card-body" style="font-size:14px">A case with a baseline is compared with
+          its last accepted run: did a change move a result it was not meant to move? This
+          says nothing about whether the result is right.</p>
+        </div>
+        <div class="card">
+          <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+          <p class="card-kicker">Reference data</p>
+          <h3 class="card-title" style="font-size:21px;margin:0">The physics</h3>
+          <p class="card-body" style="font-size:14px">A case with reference data is compared
+          with experiments, analytical solutions or another method, within a tolerance set
+          for each comparison by what agreement the model can be expected to reach.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="step" id="unit-tests">
+    <span class="num">02</span>
+    <div>
+      <h2>Unit tests</h2>
+      <p><code>./Allwmake</code> does not build the unit tests. Build them, then run them all:</p>
+      <pre>./test/Allwmake -j
+./test/Allrun</pre>
+      <p>The tests are OpenFOAM applications named <code>Test-*</code>, installed next to the
+      solvers. <code>test/Allrun</code> runs every one of them, carries on past a failure,
+      lists the tests that failed at the end and then exits with an error, so that a single
+      run reports everything that is broken.</p>
+      <p>A test reads its dictionaries from the directory it is run in. To run one by itself,
+      run it from the directory <code>test/Allrun</code> gives it, for example:</p>
+      <pre>cd test/momentInversions/univariate/univariateMomentInversion
+Test-UnivariateMomentInversion</pre>
+      <p>A test with a <code>testCase</code> directory, such as
+      <code>populationBalanceSubModels</code> or <code>univariateQuadratureApproximation</code>,
+      is run from inside it. A few tests check that an invalid state stops the
+      computation: they pass only when they stop with the expected message.</p>
+      <h3>Convergence studies</h3>
+      <p><code>test/univariateMomentAdvection</code> holds the advection of the same
+      distribution on a series of refined meshes, for the first-order and the zeta schemes.
+      They measure the order of accuracy of the schemes, and each case has its own
+      <code>Allrun</code> and <code>Allclean</code>. They are not part of
+      <code>test/Allrun</code>; the ones that have a baseline are run by the
+      <a href="#tiers">tiers</a>.</p>
+    </div>
+  </section>
+
+  <section class="step" id="cases">
+    <span class="num">03</span>
+    <div>
+      <h2>Running a case</h2>
+      <p>Every case under <code>tutorials/</code> and <code>validation/</code> has an
+      <code>Allrun</code>, which sets the case up from <code>0.orig</code>, runs it and draws
+      its figures, and an <code>Allclean</code>, which returns it to its initial state. A
+      case is run in place:</p>
+      <pre>cd validation/pbeFoam/&lt;case&gt;
+./Allrun</pre>
+      <p>Each step of an <code>Allrun</code> stops the case with an error when it fails, so
+      that a broken case does not go on to draw graphs of an old result. For the same
+      reason, a case that still holds a previous run fails at once with
+      <code>Run Allclean first</code>: OpenFOAM does not run an application whose log file
+      is already there, and the results compared would be those of the old run. To run a
+      case again:</p>
+      <pre>./Allclean
+./Allrun</pre>
+      <p>The <code>Allrun</code> of a case runs it; the checks against its baseline and its
+      reference data are made by whatever runs the cases, or by hand:</p>
+      <pre>bin/qbmmRegression check validation/pbeFoam/&lt;case&gt;
+bin/qbmmCompareReference validation/pbeFoam/&lt;case&gt;</pre>
+      <p><code>tutorials/Allrun</code> and <code>validation/Allrun</code> run and check every
+      case of their directory in place, the long ones and those meant to be run by hand
+      included. To run a chosen set of cases, use the <a href="#tiers">tiers</a>.</p>
+    </div>
+  </section>
+
+  <section class="step" id="baselines">
+    <span class="num">04</span>
+    <div>
+      <h2>Baselines</h2>
+      <p>The baseline of a case, <code>&lt;case&gt;/regression/baseline</code>, is a summary
+      of the fields of the last time the case writes, a few numbers per field: small enough
+      to keep under version control and to read in a diff, and it moves when a field moves.
+      A field is compared with its baseline to a tolerance relative to the span of the
+      field, so that the tolerance means the same for a moment of order 10<sup>&minus;12</sup>
+      and for one of order 10<sup>6</sup>. The default is 10<sup>&minus;8</sup>; a case sets
+      its own in <code>regression/tolerance</code>.</p>
+      <pre><span class="c"># compare the last run of a case with its baseline</span>
+bin/qbmmRegression check &lt;case&gt;
+
+<span class="c"># write the baseline of a case from its last run</span>
+bin/qbmmRegression record &lt;case&gt;</pre>
+      <p class="note">Recording a baseline is a decision taken case by case, never to make a
+      failing check pass. A baseline is re-recorded when a change is meant to move the
+      case, once the new result is understood and trusted, and in the same commit as the
+      change, whose message says why the case moved.</p>
+    </div>
+  </section>
+
+  <section class="step" id="reference">
+    <span class="num">05</span>
+    <div>
+      <h2>Reference data</h2>
+      <p>A case that is validated declares its figures and its comparisons in
+      <code>&lt;case&gt;/validation/validationDict</code>, with the reference data under
+      <code>validationData</code>. Each curve is declared once, in the figure it is drawn
+      in; a curve the case computes names the reference curves it is held against and the
+      tolerance of each, so that the graph and the number that judges it cannot come to
+      disagree. The format is described in <code>bin/python/qbmm/validation.py</code>.</p>
+      <pre><span class="c"># how far the case is from its reference data</span>
+bin/qbmmCompareReference &lt;case&gt;
+
+<span class="c"># draw its figures into &lt;case&gt;/validation/figures</span>
+bin/qbmmPlot &lt;case&gt;</pre>
+      <p>The reference is interpolated onto the points of the case, over the interval the
+      two share, and the difference is taken as a fraction of the scale of the reference:
+      the larger of its span and its largest value. The tolerance applies to the root mean
+      square of these fractions; the largest of them is reported beside it.</p>
+      <p>The figures need matplotlib; running and checking a case do not. Without it the
+      figures are not drawn, which is said, and the case goes on. To use an interpreter of
+      its own environment, name it with <code>QBMM_PYTHON</code>.</p>
+    </div>
+  </section>
+
+  <section class="step" id="tiers">
+    <span class="num">06</span>
+    <div>
+      <h2>Tiers</h2>
+      <p><code>bin/qbmmValidate</code> runs a tier of the cases with the unit tests and
+      reports how they came out: whether each case ran, how far it sits from its reference
+      data, and whether it still matches its baseline. A case is any directory under
+      <code>tutorials/</code>, <code>validation/</code> or <code>test/</code> with a baseline
+      or a <code>validationDict</code>.</p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Tier</th><th>Runs</th><th>Takes</th><th>When</th></tr></thead>
+          <tbody>
+            <tr><td>-quick</td><td>Every case that is neither long nor manual</td><td>Minutes</td><td>After any change to the sources</td></tr>
+            <tr><td>-baselines</td><td>Every case with a baseline that is not manual</td><td>A few hours</td><td>At the end of a piece of work</td></tr>
+            <tr><td>-complete</td><td>Every case that is not manual</td><td>A night</td><td>At a milestone and before a release</td></tr>
+            <tr><td>manual</td><td>The cases no tier runs, which are run by hand</td><td>Hours to days</td><td>When the model they test changes</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The long and the manual cases are listed, with how long each takes, in
+      <code>validation/validationTiers</code>. A new case that is short joins the quick
+      tier by itself.</p>
+      <pre><span class="c"># the cases of a tier, without running them</span>
+bin/qbmmValidate -quick -list
+
+<span class="c"># run a tier</span>
+bin/qbmmValidate -quick
+bin/qbmmValidate -complete -j 8</pre>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Option</th><th>Effect</th></tr></thead>
+          <tbody>
+            <tr><td>-list</td><td>Print the cases of the tier and run nothing</td></tr>
+            <tr><td>-j &lt;cores&gt;</td><td>The cores to use, all of them by default; a case run in parallel counts for its number of subdomains</td></tr>
+            <tr><td>-dir &lt;runDir&gt;</td><td>Where the cases are run, by default <code>$FOAM_RUN/qbmmValidate/&lt;tier&gt;-&lt;date&gt;</code></td></tr>
+            <tr><td>-noTests</td><td>Leave out the unit tests</td></tr>
+            <tr><td>-output &lt;dir&gt;</td><td>Write the report into <code>&lt;dir&gt;</code> rather than <code>&lt;runDir&gt;/report</code>; <code>-style &lt;css&gt;</code> gives it a stylesheet</td></tr>
+            <tr><td>-site &lt;siteDir&gt;</td><td>Write the report into the validation page of a copy of this site (<a href="#report">below</a>)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>The cases are copied into the run directory and run there, so that the sources
+      stay clean and a run can be examined afterwards. Matplotlib is checked for before
+      anything is run. The script exits with an error when a case or a unit test failed.</p>
+    </div>
+  </section>
+
+  <section class="step" id="report">
+    <span class="num">07</span>
+    <div>
+      <h2>The validation page</h2>
+      <p>The <a href="index.html">validation page</a> is the report of a tier, written into a
+      copy of the sources of this site: its <code>index.html</code>, the state of every case
+      in <code>results.json</code>, the figures of every case, and
+      <code>history.json</code>, which keeps each comparison of every earlier report so that
+      the page shows how it moved from one commit to the next.</p>
+      <pre><span class="c"># run the complete tier and write its report into the site</span>
+bin/qbmmValidate -complete -site &lt;siteDir&gt;
+
+<span class="c"># report the cases as their last run left them, without running them</span>
+bin/qbmmReport -site &lt;siteDir&gt; -tests &lt;log of test/Allrun&gt; [&lt;root&gt; ...]
+
+<span class="c"># write the page again from the results it holds, after a change of its layout</span>
+bin/qbmmReport -refresh -site &lt;siteDir&gt;</pre>
+      <p>Nothing is published by these commands: they write the directory, and putting it
+      on the site is a separate step.</p>
+    </div>
+  </section>
+
+  <section class="step" id="adding">
+    <span class="num">08</span>
+    <div>
+      <h2>Adding a test or a case</h2>
+      <h3 style="margin-top:14px">A unit test</h3>
+      <ul>
+        <li>A directory under <code>test/</code> with the source of the test and its
+        <code>Make/files</code> and <code>Make/options</code>, building an application
+        named <code>Test-&lt;Name&gt;</code>.</li>
+        <li>A line in <code>test/Allwmake</code> to build it and a line in
+        <code>test/Allrun</code> to run it, from the directory that holds its
+        dictionaries.</li>
+        <li>The test exits with an error when what it computes is not what it should be.</li>
+      </ul>
+      <h3>A case</h3>
+      <ul>
+        <li>An <code>Allrun</code> that runs each step through <code>runStep</code> (or
+        <code>runStepParallel</code>) of <code>AllrunFunctions</code>, and an
+        <code>Allclean</code>; the initial fields in <code>0.orig</code>.</li>
+        <li>For a validation case, the reference data under <code>validationData</code>, the
+        figures and the comparisons in <code>validation/validationDict</code>, and a call to
+        <code>plotCase</code> at the end of the <code>Allrun</code>.</li>
+        <li>A baseline, recorded with <code>bin/qbmmRegression record</code> once the
+        result of the case is trusted.</li>
+        <li>A case that takes more than a few minutes goes in the <code>long</code> list of
+        <code>validation/validationTiers</code>; one that has to be run by hand, in the
+        <code>manual</code> list, with how long it takes.</li>
+      </ul>
+    </div>
+  </section>
+
+
+  <footer>
+    <p style="margin:0;max-width:62ch">OPENFOAM® is a registered trademark of OpenCFD Limited. OpenQBMM is not approved or endorsed by OpenCFD Limited.</p>
+    <p style="margin:0">Copyright © 2014–2026 OpenQBMM developers</p>
+  </footer>
+</div>
+</body>
+</html>

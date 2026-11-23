@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="industry.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); }
+  a { color: var(--color-accent-700); text-decoration: none; }
+  a:hover { color: var(--color-accent-900); }
+</style>
+</helmet>
+<div style="max-width:1180px;margin:0 auto;padding:0 24px 80px">
+  <div role="note" style="margin:12px 0 0;padding:8px 12px;border:1px solid var(--color-divider);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.08em;color:var(--color-accent-700)">PREVIEW of the site of OpenQBMM 18, not the release. The validation results are those of development runs.</div>
+
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px 0;border-bottom:1px solid var(--color-divider);flex-wrap:wrap">
+    <a href="index.html" style="display:flex;align-items:baseline;gap:8px;color:var(--color-text)">
+      <svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true" style="align-self:center;flex:none"><line x1="6" y1="56.5" x2="58" y2="56.5" stroke="var(--color-accent-800)" stroke-width="2.4" stroke-linecap="round"/><g stroke="var(--color-accent-800)" stroke-width="3.2" stroke-linecap="round"><line x1="15" y1="56.5" x2="15" y2="38.35"/><line x1="26" y1="56.5" x2="26" y2="14.15"/><line x1="38" y1="56.5" x2="38" y2="18.92"/><line x1="50" y1="56.5" x2="50" y2="41.68"/></g><path d="M6 54 C 15 54, 17 14, 29 13 S 45 42, 58 51" fill="none" stroke="var(--color-accent-600)" stroke-width="3.2" stroke-linecap="round"/><g fill="var(--color-accent-800)"><circle cx="15" cy="38.35" r="4.2"/><circle cx="26" cy="14.15" r="4.2"/><circle cx="38" cy="18.92" r="4.2"/><circle cx="50" cy="41.68" r="4.2"/></g></svg><span style="font-family:var(--font-body);font-size:25px;line-height:1;color:var(--color-accent-800)"><span style="font-weight:400">Open</span><span style="font-weight:600">QBMM</span></span>
+      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.12em;color:var(--color-accent-700)">{{ releaseLabel }}</span>
+    </a>
+    <nav style="display:flex;gap:22px;align-items:center;font-size:14px;flex-wrap:wrap">
+      <a href="index.html#capabilities">Features</a>
+      <a href="applications.html">Applications</a>
+      <a href="installation.html">Installation</a>
+      <a href="validation/index.html">Validation</a>
+      <a href="funding.html">Funding</a>
+      <a href="contributors.html">Contributors</a>
+      <a href="references.html" style="color:var(--color-accent-900);border-bottom:2px solid var(--color-accent);padding-bottom:2px">References</a>
+      <a class="btn btn-primary" href="https://github.com/OpenQBMM/OpenQBMM" style="font-size:13px;padding:7px 14px">GitHub</a>
+    </nav>
+  </header>
+
+  <section style="padding:56px 0 44px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.72fr);gap:48px;align-items:end">
+    <div>
+      <p style="margin:0 0 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent-700)">Theory and citation</p>
+      <h1 style="margin:0;font-family:var(--font-heading);font-weight:700;font-size:clamp(40px,5vw,66px);line-height:.96">References and journal publications</h1>
+    </div>
+    <div style="border:1px solid var(--color-divider);padding:22px">
+      <p style="margin:0 0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">How to cite</p>
+      <p style="margin:0 0 12px;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">Cite OpenQBMM using its Zenodo DOI. Release-specific DOIs are listed on the Zenodo page.</p>
+      <p style="margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px"><a href="{{ citationHref }}">{{ citationDoi }}</a></p>
+    </div>
+  </section>
+
+  <section>
+    <div style="display:grid;grid-template-columns:minmax(0,.62fr) minmax(0,1fr);gap:48px;border-top:1px solid var(--color-divider);padding-top:28px">
+      <div>
+        <h2 style="margin:0;font-family:var(--font-heading);font-size:38px;line-height:1">References</h2>
+        <span style="display:inline-block;margin-top:10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">10 entries</span>
+      </div>
+      <p style="margin:0;font-size:16px;line-height:1.6;color:var(--color-neutral-800)">This section summarizes the main references used in the development of the OpenQBMM package and aims at providing a compact set of references for OpenQBMM users. It includes both references from other research groups and from the OpenQBMM developers. Complete references for specific code components are provided in the header of the corresponding implementation and can also be seen in the code documentation.</p>
+    </div>
+
+    <ol style="list-style:none;margin:32px 0 0;padding:0">
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">[1]</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">H. Dette, W.J. Studden, Matrix measures, moment spaces and Favard’s theorem for the interval [0,1] and [0,∞), <em>Linear Algebra and Its Applications.</em> 345 (2002) 169–193. <a href="https://doi.org/10.1016/S0024-3795(01)00493-1" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/S0024-3795(01)00493-1</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">[2]</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">R.O. Fox, <em>Computational Models for Turbulent Reacting Flows,</em> Cambridge University Press, 2003.</p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">[3]</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">F. Laurent, T.T. Nguyen, Realizable second-order finite-volume schemes for the advection of moment sets of the particle size distribution, <em>Journal of Computational Physics.</em> 337 (2017) 309–338. <a href="https://doi.org/10.1016/j.jcp.2017.02.046" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.jcp.2017.02.046</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">[4]</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">E. Madadi-Kandjani, A. Passalacqua, An extended quadrature-based moment method with log-normal kernel density functions, <em>Chemical Engineering Science.</em> 131 (2015) 323–339. <a href="https://doi.org/10.1016/j.ces.2015.04.005" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.ces.2015.04.005</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">[5]</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">D.L. Marchisio, R.O. Fox, <em>Computational models for polydisperse particulate and multiphase systems,</em> Cambridge University Press, Cambridge, 2013.</p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">[6]</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">C. Yuan, R.O. Fox, Conditional quadrature method of moments for kinetic equations, <em>Journal of Computational Physics.</em> 230 (2011) 8216–8246. <a href="https://doi.org/10.1016/j.jcp.2011.07.020" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.jcp.2011.07.020</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">[7]</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">C. Yuan, B. Kong, A. Passalacqua, R.O. Fox, An extended quadrature-based mass-velocity moment model for polydisperse bubbly flows, <em>The Canadian Journal of Chemical Engineering.</em> 92 (2014) 2053–2066. <a href="https://doi.org/10.1002/cjce.22006" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1002/cjce.22006</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">[8]</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">C. Yuan, F. Laurent, R.O. Fox, An extended quadrature method of moments for population balance equations, <em>Journal of Aerosol Science.</em> 51 (2012) 1–23. <a href="https://doi.org/10.1016/j.jaerosci.2012.04.003" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.jaerosci.2012.04.003</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">[9]</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">V. Vikas, Z.J. Wang, A. Passalacqua, R.O. Fox, Realizable high-order finite-volume schemes for quadrature-based moment methods, <em>Journal of Computational Physics.</em> 230 (2011) 5328–5352. <a href="https://doi.org/10.1016/j.jcp.2011.03.038" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.jcp.2011.03.038</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">[10]</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">V. Vikas, C. Yuan, Z.J. Wang, R.O. Fox, Modeling of bubble-column flows with quadrature-based moment methods, <em>Chemical Engineering Science.</em> 66 (2011) 3058–3070. <a href="https://doi.org/10.1016/j.ces.2011.03.009" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.ces.2011.03.009</a></p>
+      </li>
+    </ol>
+  </section>
+
+  <section style="padding:72px 0 0">
+    <div style="display:grid;grid-template-columns:minmax(0,.62fr) minmax(0,1fr);gap:48px;border-top:1px solid var(--color-divider);padding-top:28px">
+      <h2 style="margin:0;font-family:var(--font-heading);font-size:38px;line-height:1">Publications</h2>
+      <p style="margin:0;font-size:16px;line-height:1.6;color:var(--color-neutral-800)">This section lists a selection of the articles containing the theoretical foundations of OpenQBMM and illustrating some of the possible applications of the OpenQBMM framework.</p>
+    </div>
+
+    <h3 style="margin:44px 0 0;font-family:var(--font-heading);font-size:26px">Book chapters</h3>
+    <ul style="list-style:none;margin:16px 0 0;padding:0">
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2014</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">R.O. Fox, Quadrature-Based Moment Methods for Polydisperse Multiphase Flows, in: <em>Stochastic Methods in Fluid Mechanics,</em> Springer, Vienna, 2014: pp. 87–136. <a href="https://doi.org/10.1007/978-3-7091-1622-7_3" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1007/978-3-7091-1622-7_3</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2016</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">D.L. Marchisio, R.O. Fox, Reacting Flows and the Interaction between Turbulence and Chemistry, in: <em>Reference Module in Chemistry, Molecular Sciences and Chemical Engineering,</em> Elsevier, 2016. <a href="https://doi.org/10.1016/B978-0-12-409547-2.11526-4" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/B978-0-12-409547-2.11526-4</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2018</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">R.O. Fox, Chapter One – Quadrature-Based Moment Methods for Multiphase Chemically Reacting Flows, in: A. Parente, J. De Wilde (Eds.), <em>Advances in Chemical Engineering,</em> Academic Press, 2018: pp. 1–50. <a href="https://doi.org/10.1016/bs.ache.2018.01.001" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/bs.ache.2018.01.001</a></p>
+      </li>
+    </ul>
+
+    <h3 style="margin:52px 0 0;font-family:var(--font-heading);font-size:26px">Journal articles</h3>
+    <ul style="list-style:none;margin:16px 0 0;padding:0">
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2023</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">R.O. Fox, F. Laurent, A. Passalacqua, The generalized quadrature method of moments, <em>Journal of Aerosol Science.</em> 167 (2023) 106096. <a href="https://doi.org/10.1016/j.jaerosci.2022.106096" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.jaerosci.2022.106096</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2021</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">J.C. Heylmun, R.O. Fox, A. Passalacqua, A quadrature-based moment method for the evolution of the joint size-velocity number density function of a particle population, <em>Computer Physics Communications.</em> 267 (2021) 108072. <a href="https://doi.org/10.1016/j.cpc.2021.108072" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.cpc.2021.108072</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2019</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">J.C. Heylmun, B. Kong, A. Passalacqua, R.O. Fox, A quadrature-based moment method for polydisperse bubbly flows, <em>Computer Physics Communications.</em> 244 (2019) 187–204. <a href="https://doi.org/10.1016/j.cpc.2019.06.005" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.cpc.2019.06.005</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2018</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">R.O. Fox, F. Laurent, A. Vié, Conditional hyperbolic quadrature method of moments for kinetic equations, <em>Journal of Computational Physics.</em> 365 (2018) 269–293. <a href="https://doi.org/10.1016/j.jcp.2018.03.025" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.jcp.2018.03.025</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2018</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">A. Passalacqua, F. Laurent, E. Madadi-Kandjani, J.C. Heylmun, R.O. Fox, An open-source quadrature-based population balance solver for OpenFOAM, <em>Chemical Engineering Science.</em> 176 (2018) 306–318. <a href="https://doi.org/10.1016/j.ces.2017.10.043" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.ces.2017.10.043</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2018</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">E. Askari, P. Proulx, A. Passalacqua, Modelling of Bubbly Flow Using CFD-PBM Solver in OpenFOAM: Study of Local Population Balance Models and Extended Quadrature Method of Moments Applications, <em>ChemEngineering.</em> 2 (2018) 8. <a href="https://doi.org/10.3390/chemengineering2010008" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.3390/chemengineering2010008</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2018</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">V. Quedeville, H. Ouazaite, B. Polizzi, R.O. Fox, P. Villedieu, P. Fede, F. Létisse, J. Morchain, A two-dimensional population balance model for cell growth including multiple uptake systems, <em>Chemical Engineering Research and Design.</em> 132 (2018) 966–981. <a href="https://doi.org/10.1016/j.cherd.2018.02.025" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.cherd.2018.02.025</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2017</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">C. Chalons, R. Fox, F. Laurent, M. Massot, A. Vié, Multivariate Gaussian Extended Quadrature Method of Moments for Turbulent Disperse Multiphase Flow, <em>Multiscale Model. Simul.</em> 15 (2017) 1553–1583. <a href="https://doi.org/10.1137/16M109209X" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1137/16M109209X</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2017</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">E. Madadi-Kandjani, R.O. Fox, A. Passalacqua, Application of the Fokker-Planck molecular mixing model to turbulent scalar mixing using moment methods, <em>Physics of Fluids.</em> 29 (2017) 065109. <a href="https://doi.org/10.1063/1.4989421" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1063/1.4989421</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">n.d.</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">B. Kong, R.O. Fox, H. Feng, J. Capecelatro, R. Patel, O. Desjardins, R.O. Fox, Euler–euler anisotropic gaussian mesoscale simulation of homogeneous cluster-induced gas–particle turbulence, <em>AIChE Journal.</em> 63 (n.d.) 2630–2643. <a href="https://doi.org/10.1002/aic.15686" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1002/aic.15686</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2017</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">B. Kong, R.O. Fox, A solution algorithm for fluid–particle flows across all flow regimes, <em>Journal of Computational Physics.</em> 344 (2017) 575–594. <a href="https://doi.org/10.1016/j.jcp.2017.05.013" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.jcp.2017.05.013</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">n.d.</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">R.G. Patel, O. Desjardins, B. Kong, J. Capecelatro, R.O. Fox, Verification of Eulerian–Eulerian and Eulerian–Lagrangian simulations for turbulent fluid–particle flows, <em>AIChE Journal.</em> 63 (n.d.) 5396–5412. <a href="https://doi.org/10.1002/aic.15949" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1002/aic.15949</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2017</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">A. Wick, T.-T. Nguyen, F. Laurent, R.O. Fox, H. Pitsch, Modeling soot oxidation with the Extended Quadrature Method of Moments, <em>Proceedings of the Combustion Institute.</em> 36 (2017) 789–797. <a href="https://doi.org/10.1016/j.proci.2016.08.004" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.proci.2016.08.004</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2016</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">V. Raman, R.O. Fox, Modeling of Fine-Particle Formation in Turbulent Flames, <em>Annual Review of Fluid Mechanics.</em> 48 (2016) 159–190. <a href="https://doi.org/10.1146/annurev-fluid-122414-034306" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1146/annurev-fluid-122414-034306</a></p>
+      </li>
+      <li style="display:grid;grid-template-columns:52px minmax(0,1fr);gap:20px;padding:22px 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:4px">2016</span>
+        <p style="margin:0;font-size:16px;line-height:1.55">T.T. Nguyen, F. Laurent, R.O. Fox, M. Massot, Solution of population balance equations in applications with fine particles: Mathematical modeling and numerical schemes, <em>Journal of Computational Physics.</em> 325 (2016) 129–156. <a href="https://doi.org/10.1016/j.jcp.2016.08.017" style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">doi:10.1016/j.jcp.2016.08.017</a></p>
+      </li>
+    </ul>
+  </section>
+
+  <sc-if value="{{ showResourceCards }}" hint-placeholder-val="{{ true }}">
+  <section style="padding:64px 0 0">
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:28px">
+      <div class="card">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <p class="card-kicker">In the code</p>
+        <h3 class="card-title" style="font-size:21px">Class header files</h3>
+        <p class="card-body" style="font-size:14px">Complete references for specific code components are provided in the header of the corresponding implementation.</p>
+        <p class="card-meta"><a href="https://github.com/OpenQBMM/OpenQBMM/tree/master/src">Browse src/ →</a></p>
+      </div>
+      <div class="card">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <p class="card-kicker">Verification</p>
+        <h3 class="card-title" style="font-size:21px">Validation cases</h3>
+        <p class="card-body" style="font-size:14px">Cases comparing the solvers against rigorous solutions and experimental measurements.</p>
+        <p class="card-meta"><a href="https://github.com/OpenQBMM/OpenQBMM/tree/master/validation">Browse validation/ →</a></p>
+      </div>
+      <div class="card">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <p class="card-kicker">Teaching</p>
+        <h3 class="card-title" style="font-size:21px">Courses and talks</h3>
+        <p class="card-body" style="font-size:14px">Short courses, talks and lectures delivered by the developers of OpenQBMM.</p>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <footer style="margin-top:80px;padding-top:24px;border-top:1px solid var(--color-divider);display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;font-size:13px;color:var(--color-neutral-700)">
+    <p style="margin:0;max-width:62ch">OPENFOAM® is a registered trademark of OpenCFD Limited. OpenQBMM is not approved or endorsed by OpenCFD Limited.</p>
+    <p style="margin:0">Copyright © 2014–2026 OpenQBMM developers</p>
+  </footer>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;releaseLabel&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;v18.0 · OpenFOAM v2606&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Header&quot;},&quot;citationDoi&quot;:{&quot;editor&quot;:&quot;text&quot;,&quot;default&quot;:&quot;10.5281/zenodo.4007235&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Citation&quot;},&quot;showResourceCards&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;Sections&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    const doi = this.props.citationDoi ?? "10.5281/zenodo.4007235";
+    return {
+      releaseLabel: this.props.releaseLabel ?? "v18.0 · OpenFOAM v2606",
+      showResourceCards: this.props.showResourceCards ?? true,
+      citationDoi: doi,
+      citationHref: "https://doi.org/" + doi
+    };
+  }
+}
+</script>
+</body>
+</html>

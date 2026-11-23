@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="industry.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); }
+  a { color: var(--color-accent-700); text-decoration: none; }
+  a:hover { color: var(--color-accent-900); }
+</style>
+</helmet>
+<div style="max-width:1180px;margin:0 auto;padding:0 24px 80px">
+  <div role="note" style="margin:12px 0 0;padding:8px 12px;border:1px solid var(--color-divider);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.08em;color:var(--color-accent-700)">PREVIEW of the site of OpenQBMM 18, not the release. The validation results are those of development runs.</div>
+
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px 0;border-bottom:1px solid var(--color-divider);flex-wrap:wrap">
+    <a href="index.html" style="display:flex;align-items:baseline;gap:8px;color:var(--color-text)">
+      <svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true" style="align-self:center;flex:none"><line x1="6" y1="56.5" x2="58" y2="56.5" stroke="var(--color-accent-800)" stroke-width="2.4" stroke-linecap="round"/><g stroke="var(--color-accent-800)" stroke-width="3.2" stroke-linecap="round"><line x1="15" y1="56.5" x2="15" y2="38.35"/><line x1="26" y1="56.5" x2="26" y2="14.15"/><line x1="38" y1="56.5" x2="38" y2="18.92"/><line x1="50" y1="56.5" x2="50" y2="41.68"/></g><path d="M6 54 C 15 54, 17 14, 29 13 S 45 42, 58 51" fill="none" stroke="var(--color-accent-600)" stroke-width="3.2" stroke-linecap="round"/><g fill="var(--color-accent-800)"><circle cx="15" cy="38.35" r="4.2"/><circle cx="26" cy="14.15" r="4.2"/><circle cx="38" cy="18.92" r="4.2"/><circle cx="50" cy="41.68" r="4.2"/></g></svg><span style="font-family:var(--font-body);font-size:25px;line-height:1;color:var(--color-accent-800)"><span style="font-weight:400">Open</span><span style="font-weight:600">QBMM</span></span>
+      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.12em;color:var(--color-accent-700)">v18.0</span>
+    </a>
+    <nav style="display:flex;gap:22px;align-items:center;font-size:14px;flex-wrap:wrap">
+      <a href="index.html#capabilities">Features</a>
+      <a href="applications.html">Applications</a>
+      <a href="installation.html">Installation</a>
+      <a href="validation/index.html">Validation</a>
+      <a href="funding.html" style="color:var(--color-accent-900);border-bottom:2px solid var(--color-accent);padding-bottom:2px">Funding</a>
+      <a href="contributors.html">Contributors</a>
+      <a href="references.html">References</a>
+      <a class="btn btn-primary" href="https://github.com/OpenQBMM/OpenQBMM" style="font-size:13px;padding:7px 14px">GitHub</a>
+    </nav>
+  </header>
+
+  <section style="padding:56px 0 44px;max-width:64ch">
+    <p style="margin:0 0 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent-700)">Acknowledgments</p>
+    <h1 style="margin:0;font-family:var(--font-heading);font-weight:700;font-size:clamp(40px,5vw,66px);line-height:.96">Funding sources</h1>
+    <p style="margin:20px 0 0;font-size:17px;line-height:1.55;color:var(--color-neutral-800)">The development of the OpenQBMM solver suite was sponsored by the National Science Foundation of the United States, under the SI2 – SSE award NSF – ACI 1440443 for the period between October 1st, 2014 and September 30th, 2019.</p>
+  </section>
+
+  <section style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid var(--color-divider)">
+    <div style="padding:24px 22px;border-right:1px solid var(--color-divider)">
+      <p style="margin:0;font-family:var(--font-heading);font-size:30px;line-height:1">ACI 1440443</p>
+      <p style="margin:6px 0 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">NSF award number</p>
+    </div>
+    <div style="padding:24px 22px;border-right:1px solid var(--color-divider)">
+      <p style="margin:0;font-family:var(--font-heading);font-size:30px;line-height:1">SI2 – SSE</p>
+      <p style="margin:6px 0 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Program</p>
+    </div>
+    <div style="padding:24px 22px">
+      <p style="margin:0;font-family:var(--font-heading);font-size:30px;line-height:1">2014 – 2019</p>
+      <p style="margin:6px 0 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Award period</p>
+    </div>
+  </section>
+
+  <section style="padding:64px 0 0">
+    <h2 style="margin:0 0 8px;font-family:var(--font-heading);font-size:34px">What the award funded</h2>
+    <p style="margin:0 0 28px;max-width:62ch;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">The project ran for three years from October 1st, 2014, and covered the following work.</p>
+    <ul style="list-style:none;margin:0;padding:0;display:grid;gap:0">
+      <li style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;padding:20px 0;border-top:1px solid var(--color-divider);font-size:16px;line-height:1.6">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:5px">01</span>
+        <span>The development of computational models for turbulent multiphase flows in the framework of quadrature-based moment methods.</span>
+      </li>
+      <li style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;padding:20px 0;border-top:1px solid var(--color-divider);font-size:16px;line-height:1.6">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:5px">02</span>
+        <span>The implementation of a suite of three solvers into OpenFOAM, addressing the population balance equation for particles with negligible inertia, gas-liquid flows where bubble inertia is small but not zero, and gas-particle flows with highly inertial particles.</span>
+      </li>
+      <li style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;padding:20px 0;border-top:1px solid var(--color-divider);font-size:16px;line-height:1.6">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:5px">03</span>
+        <span>The creation of documentation, verification and validation cases, and tutorials to favor the adoption of the software and external contributions to it.</span>
+      </li>
+      <li style="display:grid;grid-template-columns:auto minmax(0,1fr);gap:20px;padding:20px 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider);font-size:16px;line-height:1.6">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;color:var(--color-accent-700);padding-top:5px">04</span>
+        <span>The distribution of the developed software under the GNU GPL 3 license, and of its documentation under the GNU FDL, in order to disseminate the results of the research and gather feedback.</span>
+      </li>
+    </ul>
+  </section>
+
+  <section style="padding:56px 0 0">
+    <div style="background:var(--color-code-bg);color:var(--color-code-fg);padding:36px 32px">
+      <p style="margin:0 0 8px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--color-accent-400)">Disclaimer</p>
+      <p style="margin:0;max-width:72ch;font-size:16px;line-height:1.6">Any opinions, findings, conclusions or recommendations expressed in this material are those of the authors and do not necessarily reflect the views of the National Science Foundation.</p>
+    </div>
+  </section>
+
+  <footer style="margin-top:80px;padding-top:24px;border-top:1px solid var(--color-divider);display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;font-size:13px;color:var(--color-neutral-700)">
+    <p style="margin:0;max-width:62ch">OPENFOAM® is a registered trademark of OpenCFD Limited. OpenQBMM is not approved or endorsed by OpenCFD Limited.</p>
+    <p style="margin:0">Copyright © 2014–2026 OpenQBMM developers</p>
+  </footer>
+</div>
+
+</x-dc>
+</body>
+</html>

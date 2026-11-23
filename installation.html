@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script src="copy.js" defer></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="industry.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); }
+  a { color: var(--color-accent-700); text-decoration: none; }
+  a:hover { color: var(--color-accent-900); }
+</style>
+</helmet>
+<div style="max-width:1180px;margin:0 auto;padding:0 24px 80px">
+  <div role="note" style="margin:12px 0 0;padding:8px 12px;border:1px solid var(--color-divider);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.08em;color:var(--color-accent-700)">PREVIEW of the site of OpenQBMM 18, not the release. The validation results are those of development runs.</div>
+
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px 0;border-bottom:1px solid var(--color-divider);flex-wrap:wrap">
+    <a href="index.html" style="display:flex;align-items:baseline;gap:8px;color:var(--color-text)">
+      <svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true" style="align-self:center;flex:none"><line x1="6" y1="56.5" x2="58" y2="56.5" stroke="var(--color-accent-800)" stroke-width="2.4" stroke-linecap="round"/><g stroke="var(--color-accent-800)" stroke-width="3.2" stroke-linecap="round"><line x1="15" y1="56.5" x2="15" y2="38.35"/><line x1="26" y1="56.5" x2="26" y2="14.15"/><line x1="38" y1="56.5" x2="38" y2="18.92"/><line x1="50" y1="56.5" x2="50" y2="41.68"/></g><path d="M6 54 C 15 54, 17 14, 29 13 S 45 42, 58 51" fill="none" stroke="var(--color-accent-600)" stroke-width="3.2" stroke-linecap="round"/><g fill="var(--color-accent-800)"><circle cx="15" cy="38.35" r="4.2"/><circle cx="26" cy="14.15" r="4.2"/><circle cx="38" cy="18.92" r="4.2"/><circle cx="50" cy="41.68" r="4.2"/></g></svg><span style="font-family:var(--font-body);font-size:25px;line-height:1;color:var(--color-accent-800)"><span style="font-weight:400">Open</span><span style="font-weight:600">QBMM</span></span>
+      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.12em;color:var(--color-accent-700)">v18.0</span>
+    </a>
+    <nav style="display:flex;gap:22px;align-items:center;font-size:14px;flex-wrap:wrap">
+      <a href="index.html#capabilities">Features</a>
+      <a href="applications.html">Applications</a>
+      <a href="installation.html" style="color:var(--color-accent-900);border-bottom:2px solid var(--color-accent);padding-bottom:2px">Installation</a>
+      <a href="validation/index.html">Validation</a>
+      <a href="funding.html">Funding</a>
+      <a href="contributors.html">Contributors</a>
+      <a href="references.html">References</a>
+      <a class="btn btn-primary" href="https://github.com/OpenQBMM/OpenQBMM" style="font-size:13px;padding:7px 14px">GitHub</a>
+    </nav>
+  </header>
+
+  <section style="padding:56px 0 40px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.7fr);gap:48px;align-items:end">
+    <div>
+      <p style="margin:0 0 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--color-accent-700)">Get started</p>
+      <h1 style="margin:0;font-family:var(--font-heading);font-weight:700;font-size:clamp(40px,5vw,66px);line-height:.96">Installation</h1>
+      <p style="margin:20px 0 0;max-width:56ch;font-size:17px;line-height:1.55;color:var(--color-neutral-800)">OpenQBMM is compiled against an existing OpenFOAM installation built from sources. Install OpenFOAM first, then build OpenQBMM in the same shell environment.</p>
+    </div>
+    <div style="border:1px solid var(--color-divider);padding:20px">
+      <p style="margin:0 0 12px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-neutral-700)">Requirements</p>
+      <ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.9;color:var(--color-neutral-800)">
+        <li>OpenFOAM v2606, built from sources</li>
+        <li>A C++ toolchain and <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">git</span></li>
+        <li>Linux, or Windows 10/11 with WSL</li>
+      </ul>
+    </div>
+  </section>
+
+  <section style="padding:24px 0 0">
+    <ol style="list-style:none;margin:0;padding:0;counter-reset:step">
+      <li style="display:grid;grid-template-columns:64px minmax(0,1fr);gap:24px;padding:28px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--color-accent-700);padding-top:6px">01</span>
+        <div>
+          <h2 style="margin:0;font-family:var(--font-heading);font-size:26px">Source the OpenFOAM environment</h2>
+          <p style="margin:8px 0 14px;max-width:64ch;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">Every build and every run happens in a shell where the OpenFOAM environment is loaded. Adjust the path to your installation.</p>
+          <pre style="margin:0;border:1px solid var(--color-divider);background:var(--color-code-bg);color:var(--color-code-fg);padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.8;overflow-x:auto">source $HOME/OpenFOAM/OpenFOAM-v2606/etc/bashrc</pre>
+        </div>
+      </li>
+      <li style="display:grid;grid-template-columns:64px minmax(0,1fr);gap:24px;padding:28px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--color-accent-700);padding-top:6px">02</span>
+        <div>
+          <h2 style="margin:0;font-family:var(--font-heading);font-size:26px">Clone the repository</h2>
+          <p style="margin:8px 0 14px;max-width:64ch;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">Clone into your OpenFOAM user directory, or anywhere you keep sources.</p>
+          <pre style="margin:0;border:1px solid var(--color-divider);background:var(--color-code-bg);color:var(--color-code-fg);padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.8;overflow-x:auto">git clone https://github.com/OpenQBMM/OpenQBMM.git
+cd OpenQBMM</pre>
+          <p style="margin:14px 0 0;max-width:64ch;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">This downloads the whole repository, about 156 MB. To build OpenQBMM only, <a href="#sparse">a smaller download</a> of about 5 MB is enough.</p>
+        </div>
+      </li>
+      <li style="display:grid;grid-template-columns:64px minmax(0,1fr);gap:24px;padding:28px 0;border-top:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--color-accent-700);padding-top:6px">03</span>
+        <div>
+          <h2 style="margin:0;font-family:var(--font-heading);font-size:26px">Build</h2>
+          <p style="margin:8px 0 14px;max-width:64ch;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">The build script compiles the libraries, then the solvers and utilities. Use <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">-j</span> to compile in parallel.</p>
+          <pre style="margin:0;border:1px solid var(--color-divider);background:var(--color-code-bg);color:var(--color-code-fg);padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.8;overflow-x:auto">./Allwmake -j</pre>
+        </div>
+      </li>
+      <li style="display:grid;grid-template-columns:64px minmax(0,1fr);gap:24px;padding:28px 0;border-top:1px solid var(--color-divider);border-bottom:1px solid var(--color-divider)">
+        <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;color:var(--color-accent-700);padding-top:6px">04</span>
+        <div>
+          <h2 style="margin:0;font-family:var(--font-heading);font-size:26px">Run a tutorial</h2>
+          <p style="margin:8px 0 14px;max-width:64ch;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">Copy the tutorials out of the repository, with the <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">AllrunFunctions</span> their scripts read, and run one to confirm the build works.</p>
+          <pre style="margin:0;border:1px solid var(--color-divider);background:var(--color-code-bg);color:var(--color-code-fg);padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.8;overflow-x:auto">mkdir -p $FOAM_RUN/OpenQBMM
+cp -r AllrunFunctions tutorials $FOAM_RUN/OpenQBMM
+cd $FOAM_RUN/OpenQBMM/tutorials/pbeFoam/aggregationBreakup
+./Allrun</pre>
+        </div>
+      </li>
+    </ol>
+  </section>
+
+  <section id="sparse" style="padding:64px 0 0">
+    <h2 style="margin:0 0 8px;font-family:var(--font-heading);font-size:34px">A smaller download</h2>
+    <p style="margin:0 0 8px;max-width:68ch;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">Most of the size of the repository is not code: the meshes of the convergence studies of the tests and the reference data of the validation cases. A partial, sparse clone downloads the history without the contents of the files, and checks out only what the build and the tutorials need, about 5 MB instead of about 156 MB. Run these in place of step 02:</p>
+    <pre style="margin:14px 0 0;border:1px solid var(--color-divider);background:var(--color-code-bg);color:var(--color-code-fg);padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.8;overflow-x:auto">git clone --filter=blob:none --sparse https://github.com/OpenQBMM/OpenQBMM.git
+cd OpenQBMM
+git sparse-checkout set src applications bin tutorials</pre>
+    <dl style="margin:8px 0 0">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:8px 32px;padding:22px 0;border-bottom:1px solid var(--color-divider)">
+        <dt style="font-family:var(--font-heading);font-size:21px;font-weight:600">How it works</dt>
+        <dd style="margin:0;min-width:0;font-size:15px;line-height:1.6;color:var(--color-neutral-800)"><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">--filter=blob:none</span> downloads the commits and the directory listings without the contents of the files, which git fetches when a directory is checked out. <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">--sparse</span> starts with the files at the top of the repository only, <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">Allwmake</span> and the scripts it reads among them, and <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">sparse-checkout set</span> adds the directories named. Checking out more, or another branch, needs a network connection. Git 2.26 or later is needed.</dd>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:8px 32px;padding:22px 0;border-bottom:1px solid var(--color-divider)">
+        <dt style="font-family:var(--font-heading);font-size:21px;font-weight:600">The unit tests</dt>
+        <dd style="margin:0;min-width:0;font-size:15px;line-height:1.6;color:var(--color-neutral-800)"><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">git sparse-checkout add test</span> brings the whole of <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">test</span>, 280 MB of it the meshes of the convergence studies in <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">test/univariateMomentAdvection</span>. The unit tests need only the two utilities beside those meshes, so this adds them in about 4 MB:
+          <pre style="margin:12px 0 0;border:1px solid var(--color-divider);background:var(--color-code-bg);color:var(--color-code-fg);padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.8;overflow-x:auto">git sparse-checkout add \
+    $(git ls-tree -d --name-only HEAD test/ \
+      | grep -v univariateMomentAdvection) \
+    test/univariateMomentAdvection/setMoments1D \
+    test/univariateMomentAdvection/setMoments2D</pre></dd>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:8px 32px;padding:22px 0;border-bottom:1px solid var(--color-divider)">
+        <dt style="font-family:var(--font-heading);font-size:21px;font-weight:600">The validation cases and the whole tree</dt>
+        <dd style="margin:0;min-width:0;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">The tiers of the validation run cases from <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">tutorials</span>, <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">validation</span> and <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">test</span>, so they need all three, the convergence studies included. The first command adds the validation cases, about 180 MB; the second checks out the whole tree:
+          <pre style="margin:12px 0 0;border:1px solid var(--color-divider);background:var(--color-code-bg);color:var(--color-code-fg);padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.8;overflow-x:auto">git sparse-checkout add validation
+git sparse-checkout disable</pre></dd>
+      </div>
+    </dl>
+  </section>
+
+  <section id="development" style="padding:64px 0 0">
+    <h2 style="margin:0 0 8px;font-family:var(--font-heading);font-size:34px">Building for development</h2>
+    <p style="margin:0 0 8px;max-width:68ch;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">What a developer needs beyond the four steps above. To test and validate a build, see <a href="validation/running.html">running the tests and the validation</a>.</p>
+    <dl style="margin:0">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:8px 32px;padding:22px 0;border-bottom:1px solid var(--color-divider)">
+        <dt style="font-family:var(--font-heading);font-size:21px;font-weight:600">Where the build goes</dt>
+        <dd style="margin:0;min-width:0;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">The libraries and the applications go to <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">FOAM_USER_LIBBIN</span> and <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">FOAM_USER_APPBIN</span> unless <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">-prefix</span> or the variables <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">FOAM_MODULE_LIBBIN</span> and <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">FOAM_MODULE_APPBIN</span> name another place; <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">FOAM_MODULE_PREFIX=false</span> skips the build.
+          <pre style="margin:12px 0 0;border:1px solid var(--color-divider);background:var(--color-code-bg);color:var(--color-code-fg);padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.8;overflow-x:auto">./Allwmake -j -prefix=&lt;dir&gt;
+./Allwclean</pre></dd>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:8px 32px;padding:22px 0;border-bottom:1px solid var(--color-divider)">
+        <dt style="font-family:var(--font-heading);font-size:21px;font-weight:600">A packaged OpenFOAM</dt>
+        <dd style="margin:0;min-width:0;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">With the openfoam.com packages, the build runs in the environment of the package without sourcing it:
+          <pre style="margin:12px 0 0;border:1px solid var(--color-divider);background:var(--color-code-bg);color:var(--color-code-fg);padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.8;overflow-x:auto">/usr/bin/openfoam2606 ./Allwmake -j</pre></dd>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:8px 32px;padding:22px 0;border-bottom:1px solid var(--color-divider)">
+        <dt style="font-family:var(--font-heading);font-size:21px;font-weight:600">One library or one solver</dt>
+        <dd style="margin:0;min-width:0;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">After a change to a source file, only what contains it needs building again:
+          <pre style="margin:12px 0 0;border:1px solid var(--color-divider);background:var(--color-code-bg);color:var(--color-code-fg);padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.8;overflow-x:auto">wmake libso src/quadratureMethods/momentInversion
+wmake applications/solvers/populationBalance/pbeFoam</pre></dd>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:8px 32px;padding:22px 0;border-bottom:1px solid var(--color-divider)">
+        <dt style="font-family:var(--font-heading);font-size:21px;font-weight:600">After a change to a header</dt>
+        <dd style="margin:0;min-width:0;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">A change to the layout of a class, a member or a virtual function added or removed, has to reach everything compiled against it. A library, a solver or a test built against the old layout loads without complaint and then calls the wrong function or crashes. Build everything again, the tests included:
+          <pre style="margin:12px 0 0;border:1px solid var(--color-divider);background:var(--color-code-bg);color:var(--color-code-fg);padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.8;overflow-x:auto">./Allwmake -j &amp;&amp; ./test/Allwmake -j</pre></dd>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:8px 32px;padding:22px 0;border-bottom:1px solid var(--color-divider)">
+        <dt style="font-family:var(--font-heading);font-size:21px;font-weight:600">Build order</dt>
+        <dd style="margin:0;min-width:0;font-size:15px;line-height:1.6;color:var(--color-neutral-800)"><span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">src/Allwmake</span> builds the libraries in the order of their dependencies, from <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">Vandermonde</span> to <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">populationBalanceModels</span>. A library reaches the headers of another through its <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">lnInclude</span> directory, written as a relative path in <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">Make/options</span>, so a new library is inserted in that list after the ones it uses.</dd>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:8px 32px;padding:22px 0;border-bottom:1px solid var(--color-divider)">
+        <dt style="font-family:var(--font-heading);font-size:21px;font-weight:600">Several OpenFOAM versions</dt>
+        <dd style="margin:0;min-width:0;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">The sources compile on earlier openfoam.com releases than the one they are developed on. Code that depends on the version is guarded with <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">#if (OPENFOAM &gt;= NNNN)</span>, in the sources and in <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px">Make/options</span> alike.</dd>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:8px 32px;padding:22px 0;border-bottom:1px solid var(--color-divider)">
+        <dt style="font-family:var(--font-heading);font-size:21px;font-weight:600">A debug build</dt>
+        <dd style="margin:0;min-width:0;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">OpenFOAM keeps the debug and the optimised builds apart. Load the environment of the debug build of OpenFOAM, then build OpenQBMM in it as above:
+          <pre style="margin:12px 0 0;border:1px solid var(--color-divider);background:var(--color-code-bg);color:var(--color-code-fg);padding:14px 16px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;line-height:1.8;overflow-x:auto">source $HOME/OpenFOAM/OpenFOAM-v2606/etc/bashrc WM_COMPILE_OPTION=Debug</pre></dd>
+      </div>
+    </dl>
+  </section>
+
+  <section style="padding:64px 0 0">
+    <h2 style="margin:0 0 24px;font-family:var(--font-heading);font-size:34px">Platform notes</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:28px">
+      <div class="card">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <p class="card-kicker">Linux</p>
+        <h3 class="card-title" style="font-size:21px">Build from sources</h3>
+        <p class="card-body" style="font-size:14px">Install OpenFOAM from sources following the instructions for your distribution, then build OpenQBMM in the same environment.</p>
+      </div>
+      <div class="card">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <p class="card-kicker">Windows 10 / 11</p>
+        <h3 class="card-title" style="font-size:21px">Windows Subsystem for Linux</h3>
+        <p class="card-body" style="font-size:14px">WSL runs OpenQBMM without installing a Linux distribution directly. Recommended for rapidly testing the capabilities of the code, and convenient for developers who run their simulations on remote HPC clusters.</p>
+      </div>
+      <div class="card">
+        <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+        <p class="card-kicker">Releases</p>
+        <h3 class="card-title" style="font-size:21px">Stable versions</h3>
+        <p class="card-body" style="font-size:14px">Tagged releases are published on GitHub with a DOI for each version, and pair with a specific OpenFOAM release.</p>
+        <p class="card-meta"><a href="https://github.com/OpenQBMM/OpenQBMM/releases">Download releases →</a></p>
+      </div>
+    </div>
+  </section>
+
+  <section style="padding:56px 0 0">
+    <div style="border:1px solid var(--color-divider);padding:28px 32px;display:flex;align-items:center;justify-content:space-between;gap:28px;flex-wrap:wrap">
+      <p style="margin:0;max-width:64ch;font-size:15px;line-height:1.6;color:var(--color-neutral-800)">The theory behind each class is documented in the references reported in the header files of the C++ source.</p>
+      <a class="btn btn-secondary" href="references.html" style="padding:11px 22px;font-size:15px">See references</a>
+    </div>
+  </section>
+
+  <footer style="margin-top:80px;padding-top:24px;border-top:1px solid var(--color-divider);display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;font-size:13px;color:var(--color-neutral-700)">
+    <p style="margin:0;max-width:62ch">OPENFOAM® is a registered trademark of OpenCFD Limited. OpenQBMM is not approved or endorsed by OpenCFD Limited.</p>
+    <p style="margin:0">Copyright © 2014–2026 OpenQBMM developers</p>
+  </footer>
+</div>
+
+</x-dc>
+</body>
+</html>

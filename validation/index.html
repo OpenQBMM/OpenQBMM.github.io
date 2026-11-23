@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<!--
+    OpenQBMM validation dashboard
+
+    Copyright (C) 2026 Alberto Passalacqua. Part of OpenQBMM, distributed
+    under the GNU General Public License, version 3 or later.
+
+    Written by bin/qbmmReport, which puts the results of the validation
+    cases into DATA below and next to the page as results.json and
+    history.json. The page is drawn in the tokens of the stylesheet of the
+    OpenQBMM site, industry.css. With qbmmReport -site the page is written
+    into the validation directory of the site, takes the header and the
+    footer of the home page of the site between the markers below, and
+    links the stylesheet of the site; otherwise -style copies a stylesheet
+    next to it.
+-->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="icon" href="../favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="../apple-touch-icon.png">
+<title>Verification and validation · OpenQBMM</title>
+<link rel="stylesheet" href="../industry.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&amp;family=Barlow+Condensed:wght@500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+  :root { --mono: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  body { margin: 0; background: var(--color-bg, #f2f2f3); color: var(--color-text, #1d1f20); font-family: var(--font-body, sans-serif); }
+  a { color: var(--color-accent-700); text-decoration: none; }
+  a:hover { color: var(--color-accent-900); }
+  .page { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
+  .mono { font-family: var(--mono); }
+  .kicker { margin: 0 0 18px; font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--color-accent-700); }
+  .label { font-family: var(--mono); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--color-neutral-700); }
+  h1 { margin: 0; font-family: var(--font-heading); font-weight: 700; font-size: clamp(40px, 5.5vw, 72px); line-height: .94; letter-spacing: -.01em; }
+  h2 { margin: 0 0 6px; font-family: var(--font-heading); font-size: 32px; }
+  .lead { margin: 22px 0 0; max-width: 62ch; font-size: 17px; line-height: 1.5; color: var(--color-neutral-800); }
+
+  /* The spec-sheet plate of the totals */
+  .plate { position: relative; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); border: 1px solid var(--color-divider); margin-top: 40px; }
+  .plate > div { padding: 20px 22px; }
+  .plate > div + div { border-left: 1px solid var(--color-divider); }
+  .plate .value { font-family: var(--font-heading); font-weight: 700; font-size: 44px; line-height: 1; margin-top: 10px; }
+  .plate .value small { font-size: 22px; color: var(--color-neutral-600); font-weight: 600; }
+  .plate .note { margin-top: 8px; font-size: 13px; color: var(--color-neutral-700); }
+  .plate .note.bad { color: var(--color-accent-900); font-weight: 600; }
+
+  .controls { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; margin: 56px 0 8px; }
+  .controls .input { flex: 0 1 320px; min-width: 200px; width: auto; }
+
+  /* The cases, a table per solver */
+  .group { padding-top: 40px; }
+  .group h2 { font-size: 26px; }
+  .cases { width: 100%; border-collapse: collapse; font-size: 14px; table-layout: fixed; }
+  .cases col.status { width: 110px; } .cases col.cmp { width: 170px; } .cases col.base { width: 100px; } .cases col.time { width: 90px; } .cases col.date { width: 110px; }
+  .cases th { text-align: left; padding: 10px 12px 10px 0; font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: .12em; text-transform: uppercase; color: var(--color-neutral-700); border-bottom: 1px solid var(--color-divider); }
+  .cases td { padding: 12px 12px 12px 0; border-bottom: 1px solid var(--color-divider); vertical-align: middle; }
+  .cases tr.row { cursor: pointer; }
+  .cases tr.row:hover td { background: color-mix(in srgb, var(--color-accent) 7%, transparent); }
+  .cases tr.row:focus-visible { outline: 2px solid var(--color-accent); outline-offset: -2px; }
+  .cases td.name { font-family: var(--mono); font-size: 13px; overflow-wrap: anywhere; }
+  .scroll { overflow-x: auto; }
+  .cases td.num { font-family: var(--mono); font-size: 12px; color: var(--color-neutral-800); white-space: nowrap; }
+  .chevron { display: inline-block; width: 12px; margin-right: 6px; text-align: center; color: var(--color-accent); transition: transform .15s; }
+  tr.open .chevron { transform: rotate(90deg); }
+
+  .tag-fail { background: var(--color-accent-900); color: var(--color-bg); font-weight: 600; }
+  .tag { font-family: var(--mono); letter-spacing: .06em; text-transform: uppercase; font-size: 10px; }
+
+  /* A comparison drawn against its tolerance: the bar is the rms, the tick
+     the tolerance, at a quarter of the width */
+  .meter { position: relative; display: inline-block; width: 120px; height: 8px; background: var(--color-neutral-200); vertical-align: middle; }
+  .meter i { position: absolute; left: 0; top: 0; bottom: 0; background: var(--color-accent); }
+  .meter i.over { background: var(--color-accent-900); }
+  .meter b { position: absolute; top: -3px; bottom: -3px; width: 1px; background: var(--color-text); left: 25%; }
+  .dots { display: inline-flex; gap: 3px; vertical-align: middle; }
+  .dots span { width: 9px; height: 9px; border: 1px solid var(--color-accent); }
+  .dots span.pass { background: var(--color-accent); }
+  .dots span.fail { background: var(--color-accent-900); border-color: var(--color-accent-900); }
+  .dots span.report { border-style: dashed; border-color: var(--color-neutral-600); }
+
+  .detail td { padding: 8px 0 36px; background: none !important; }
+  .figures { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 440px), 1fr)); gap: 24px; margin: 8px 0 24px; }
+  .figure { position: relative; border: 1px solid var(--color-divider); padding: 14px; margin: 0; }
+  .figure img { display: block; width: 100%; height: auto; }
+  /* A themed figure carries the colours of the theme; one in fixed dark
+     ink on a transparent ground (paper) keeps a light ground of its own in
+     the dark theme */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .figure img.paper { background: #f2f2f3; padding: 6px; }
+  }
+  .figure figcaption { margin-top: 8px; }
+  .corner { position: absolute; width: 9px; height: 9px; }
+  .corner::before, .corner::after { content: ""; position: absolute; background: var(--color-accent); }
+  .corner::before { left: 4px; top: 0; width: 1px; height: 9px; }
+  .corner::after { top: 4px; left: 0; height: 1px; width: 9px; }
+  .corner.tl { left: -5px; top: -5px; } .corner.tr { right: -5px; top: -5px; }
+  .corner.bl { left: -5px; bottom: -5px; } .corner.br { right: -5px; bottom: -5px; }
+
+  .sub { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .sub th { text-align: left; padding: 6px 12px 6px 0; font-family: var(--mono); font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--color-neutral-700); border-bottom: 1px solid var(--color-divider); }
+  .sub td { padding: 8px 12px 8px 0; border-bottom: 1px solid var(--color-divider); }
+  .sub td.num { font-family: var(--mono); font-size: 12px; white-space: nowrap; }
+  .facts { display: flex; gap: 28px; flex-wrap: wrap; margin: 6px 0 18px; font-size: 13px; color: var(--color-neutral-800); }
+  .facts span { min-width: 0; overflow-wrap: anywhere; }
+  .facts span b { font-family: var(--mono); font-weight: 500; font-size: 12px; color: var(--color-text); }
+  .problems { font-family: var(--mono); font-size: 12px; color: var(--color-neutral-800); margin: 8px 0 0; padding-left: 18px; }
+
+  .tests { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr)); column-gap: 28px; border-top: 1px solid var(--color-divider); margin-top: 20px; }
+  .tests > div { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--color-divider); font-family: var(--mono); font-size: 12px; }
+  .tests .test { min-width: 0; overflow-wrap: anywhere; }
+  .tests small { display: block; margin-top: 3px; font-size: 11px; color: var(--color-neutral-700); }
+  .tag { white-space: nowrap; flex: none; }
+  .empty { color: var(--color-neutral-700); font-size: 14px; margin-top: 16px; }
+
+  body > .page > footer { margin-top: 80px; padding-top: 24px; border-top: 1px solid var(--color-divider); display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; font-size: 13px; color: var(--color-neutral-700); }
+  @media (max-width: 720px) {
+    .cases th.wide, .cases td.wide { display: none; }
+    .cases td, .cases th { padding-right: 8px; }
+    .cases th { letter-spacing: .04em; }
+    .dots { display: none; }
+    .cases col.cmp { width: 64px; } .cases col.status { width: 84px; }
+    .cases col.base, .cases col.time, .cases col.date { width: 0; }
+    .plate > div + div { border-left: 0; border-top: 1px solid var(--color-divider); }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div role="note" style="margin:12px 0 0;padding:8px 12px;border:1px solid var(--color-divider);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.08em;color:var(--color-accent-700)">PREVIEW of the site of OpenQBMM 18, not the release. The validation results are those of development runs.</div>
+
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px 0;border-bottom:1px solid var(--color-divider);flex-wrap:wrap">
+    <a href="../index.html" style="display:flex;align-items:baseline;gap:8px;color:var(--color-text)">
+      <svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true" style="align-self:center;flex:none"><line x1="6" y1="56.5" x2="58" y2="56.5" stroke="var(--color-accent-800)" stroke-width="2.4" stroke-linecap="round"/><g stroke="var(--color-accent-800)" stroke-width="3.2" stroke-linecap="round"><line x1="15" y1="56.5" x2="15" y2="38.35"/><line x1="26" y1="56.5" x2="26" y2="14.15"/><line x1="38" y1="56.5" x2="38" y2="18.92"/><line x1="50" y1="56.5" x2="50" y2="41.68"/></g><path d="M6 54 C 15 54, 17 14, 29 13 S 45 42, 58 51" fill="none" stroke="var(--color-accent-600)" stroke-width="3.2" stroke-linecap="round"/><g fill="var(--color-accent-800)"><circle cx="15" cy="38.35" r="4.2"/><circle cx="26" cy="14.15" r="4.2"/><circle cx="38" cy="18.92" r="4.2"/><circle cx="50" cy="41.68" r="4.2"/></g></svg><span style="font-family:var(--font-body);font-size:25px;line-height:1;color:var(--color-accent-800)"><span style="font-weight:400">Open</span><span style="font-weight:600">QBMM</span></span>
+      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.12em;color:var(--color-accent-700)">v18.0</span>
+    </a>
+    <nav style="display:flex;gap:22px;align-items:center;font-size:14px;flex-wrap:wrap">
+      <a href="../index.html#capabilities">Features</a>
+      <a href="../applications.html">Applications</a>
+      <a href="../installation.html">Installation</a>
+      <a href="index.html" style="color:var(--color-accent-900);border-bottom:2px solid var(--color-accent);padding-bottom:2px">Validation</a>
+      <a href="../funding.html">Funding</a>
+      <a href="../contributors.html">Contributors</a>
+      <a href="../references.html">References</a>
+      <a class="btn btn-primary" href="https://github.com/OpenQBMM/OpenQBMM" style="font-size:13px;padding:7px 14px">GitHub</a>
+    </nav>
+  </header>
+
+  <section style="padding:64px 0 0">
+    <p class="kicker" id="kicker">Validation</p>
+    <h1>Verification and validation</h1>
+    <p class="lead">Verification checks that OpenQBMM solves its equations correctly: the
+    unit tests of its algorithms, the comparisons with analytical and reference numerical
+    solutions, and the baseline each case recorded from its last accepted run. Validation
+    checks that the equations describe the physics, by comparison with experiments and
+    molecular dynamics. Each comparison is held to a tolerance set for it.</p>
+    <p class="lead" style="font-size:15px;margin-top:14px"><a href="running.html">How these results are produced, and how to reproduce them →</a></p>
+    <div class="plate" id="plate">
+      <i class="corner tl"></i><i class="corner tr"></i><i class="corner bl"></i><i class="corner br"></i>
+    </div>
+  </section>
+
+  <div class="controls">
+    <div class="seg" role="radiogroup" aria-label="Show">
+      <label class="seg-opt"><input type="radio" name="show" value="all" checked> All</label>
+      <label class="seg-opt"><input type="radio" name="show" value="failed"> Failed</label>
+      <label class="seg-opt"><input type="radio" name="show" value="passed"> Passed</label>
+      <label class="seg-opt"><input type="radio" name="show" value="notRun"> Not run</label>
+    </div>
+    <input class="input" id="search" type="search" placeholder="Filter cases" aria-label="Filter cases">
+  </div>
+
+  <div id="groups"></div>
+
+  <section class="group" id="testsSection">
+    <h2>Unit tests</h2>
+    <p class="label" id="testsNote"></p>
+    <div class="tests" id="tests"></div>
+  </section>
+
+  <footer style="margin-top:80px;padding-top:24px;border-top:1px solid var(--color-divider);display:flex;justify-content:space-between;gap:32px;flex-wrap:wrap;font-size:13px;color:var(--color-neutral-700)">
+    <p style="margin:0;max-width:62ch">OPENFOAM® is a registered trademark of OpenCFD Limited. OpenQBMM is not approved or endorsed by OpenCFD Limited.</p>
+    <p style="margin:0">Copyright © 2014–2026 OpenQBMM developers</p>
+  </footer>
+</div>
+
+<script>
+"use strict";
+
+// Filled in by qbmmReport; when the page is served without it, it is read
+// from results.json and history.json next to the page
+const DATA = {"results": {"build": {"commit": "", "shortCommit": "", "branch": "", "subject": "", "modified": false, "openfoam": "v2606", "tier": "complete", "date": "2026-10-13T00:39:40+00:00"}, "summary": {"cases": 61, "passed": 61, "failed": 0, "notRun": 0, "comparisons": 138, "comparisonsJudged": 109, "comparisonsPassed": 109, "comparisonsFailed": 0, "comparisonsNotRun": 0, "comparisonsReported": 29, "baselines": 60, "baselinesPassed": 60, "baselinesNotRun": 0, "tests": 48, "testsPassed": 48}, "cases": [{"path": "test/univariateMomentAdvection/zeta/bimodal/1D/testCase1D_100", "application": null, "run": {"ran": false}, "comparisons": [], "regression": {"status": "pass"}, "figures": [], "status": "passed"}, {"path": "test/univariateMomentAdvection/zeta/regular/1D/testCase1D_100", "application": null, "run": {"ran": false}, "comparisons": [], "regression": {"status": "pass"}, "figures": [], "status": "passed"}, {"path": "tutorials/mixingFoam/mixingReactionGQMOM", "application": "mixingFoam", "run": {"ran": false}, "comparisons": [{"name": "product/Gauss/exact", "figure": "product", "computed": "Gauss, 3 environments", "reference": "Beta distribution, exact", "tolerance": 0.02, "rms": 0.008345364659284142, "largest": 0.028935333197500045, "points": 100, "referencePoints": 101, "verdict": "pass"}, {"name": "product/GQMOM/exact", "figure": "product", "computed": "Beta-GQMOM, 3 + 2 environments", "reference": "Beta distribution, exact", "tolerance": 0.01, "rms": 0.00424752629974656, "largest": 0.009993983805000033, "points": 100, "referencePoints": 101, "verdict": "pass"}, {"name": "reactants/A/exactA", "figure": "reactants", "computed": "$\\langle Y_A\\rangle$, beta-GQMOM", "reference": "$\\langle Y_A\\rangle$, exact", "tolerance": null, "rms": 0.013482678350088614, "largest": 0.03172332777524413, "points": 100, "referencePoints": 101, "verdict": "report"}, {"name": "reactants/B/exactB", "figure": "reactants", "computed": "$\\langle Y_B\\rangle$, beta-GQMOM", "reference": "$\\langle Y_B\\rangle$, exact", "tolerance": null, "rms": 0.005211459819156187, "largest": 0.012262018255959874, "points": 100, "referencePoints": 101, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "product", "file": "figures/tutorials/mixingFoam/mixingReactionGQMOM/product.svg"}, {"name": "reactants", "file": "figures/tutorials/mixingFoam/mixingReactionGQMOM/reactants.svg"}], "status": "passed"}, {"path": "tutorials/mixingFoam/mixingReactionIEM", "application": "mixingFoam", "run": {"ran": true, "completed": true, "seconds": 1.05, "date": "2026-11-04T20:14:52+00:00"}, "comparisons": [], "regression": {"status": "pass"}, "figures": [{"name": "environmentTemperature", "file": "figures/tutorials/mixingFoam/mixingReactionIEM/environmentTemperature.svg"}, {"name": "environmentMixtureFraction", "file": "figures/tutorials/mixingFoam/mixingReactionIEM/environmentMixtureFraction.svg"}, {"name": "temperature", "file": "figures/tutorials/mixingFoam/mixingReactionIEM/temperature.svg"}, {"name": "composition", "file": "figures/tutorials/mixingFoam/mixingReactionIEM/composition.svg"}], "status": "passed"}, {"path": "tutorials/mixingFoam/mixingReactionIEMEnthalpy", "application": "mixingFoam", "run": {"ran": true, "completed": true, "seconds": 1.16, "date": "2026-11-04T20:14:56+00:00"}, "comparisons": [{"name": "environmentTemperature/node0/linear0", "figure": "environmentTemperature", "computed": "Environment 0", "reference": "Environment 0, linear enthalpy", "tolerance": 1e-08, "rms": 1.402155300391128e-12, "largest": 3.416751220757501e-12, "points": 190, "referencePoints": 190, "verdict": "pass"}, {"name": "environmentTemperature/node1/linear1", "figure": "environmentTemperature", "computed": "Environment 1", "reference": "Environment 1, linear enthalpy", "tolerance": 1e-08, "rms": 3.817147130941448e-12, "largest": 8.29340336851574e-12, "points": 190, "referencePoints": 190, "verdict": "pass"}, {"name": "environmentTemperature/node2/linear2", "figure": "environmentTemperature", "computed": "Environment 2", "reference": "Environment 2, linear enthalpy", "tolerance": 1e-08, "rms": 1.982654798383404e-11, "largest": 1.9205219704277322e-10, "points": 190, "referencePoints": 190, "verdict": "pass"}, {"name": "temperature/linear", "figure": "temperature", "computed": "Transported enthalpy (OpenQBMM)", "reference": "Linear enthalpy", "tolerance": 1e-08, "rms": 1.2035408723511316e-12, "largest": 7.419132640283323e-12, "points": 190, "referencePoints": 190, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "environmentTemperature", "file": "figures/tutorials/mixingFoam/mixingReactionIEMEnthalpy/environmentTemperature.svg"}, {"name": "environmentMixtureFraction", "file": "figures/tutorials/mixingFoam/mixingReactionIEMEnthalpy/environmentMixtureFraction.svg"}, {"name": "temperature", "file": "figures/tutorials/mixingFoam/mixingReactionIEMEnthalpy/temperature.svg"}, {"name": "composition", "file": "figures/tutorials/mixingFoam/mixingReactionIEMEnthalpy/composition.svg"}], "status": "passed"}, {"path": "tutorials/mixingFoam/mixingReactionTwoStreams", "application": "mixingFoam", "run": {"ran": true, "completed": true, "seconds": 0.97, "date": "2026-11-04T20:14:55+00:00"}, "comparisons": [{"name": "product/exact", "figure": "product", "computed": "OpenQBMM", "reference": "Two environments, exact", "tolerance": 0.0001, "rms": 7.533601027222327e-11, "largest": 2.366665891040398e-10, "points": 1000, "referencePoints": 1001, "verdict": "pass"}, {"name": "reactants/A/exactA", "figure": "reactants", "computed": "$\\langle Y_A\\rangle$", "reference": "$\\langle Y_A\\rangle$, exact", "tolerance": 0.0001, "rms": 7.118292732490151e-11, "largest": 2.2624866671030016e-10, "points": 1000, "referencePoints": 1001, "verdict": "pass"}, {"name": "reactants/B/exactB", "figure": "reactants", "computed": "$\\langle Y_B\\rangle$", "reference": "$\\langle Y_B\\rangle$, exact", "tolerance": 0.0001, "rms": 3.165644536469596e-11, "largest": 1.0000006775027056e-10, "points": 1000, "referencePoints": 1001, "verdict": "pass"}, {"name": "environmentMixtureFraction/node0/exact0", "figure": "environmentMixtureFraction", "computed": "Environment 0", "reference": "Environment 0, exact", "tolerance": 0.0001, "rms": 9.22763665921766e-11, "largest": 1.416254060301287e-10, "points": 1000, "referencePoints": 1001, "verdict": "pass"}, {"name": "environmentMixtureFraction/node1/exact1", "figure": "environmentMixtureFraction", "computed": "Environment 1", "reference": "Environment 1, exact", "tolerance": 0.0001, "rms": 1.2333478479252802e-10, "largest": 1.880000044529595e-10, "points": 1000, "referencePoints": 1001, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "product", "file": "figures/tutorials/mixingFoam/mixingReactionTwoStreams/product.svg"}, {"name": "reactants", "file": "figures/tutorials/mixingFoam/mixingReactionTwoStreams/reactants.svg"}, {"name": "environmentMixtureFraction", "file": "figures/tutorials/mixingFoam/mixingReactionTwoStreams/environmentMixtureFraction.svg"}], "status": "passed"}, {"path": "tutorials/mixingReactingFoam/plugFlowMethane", "application": "mixingReactingFoam", "run": {"ran": true, "completed": true, "seconds": 56.06, "date": "2026-11-04T20:15:50+00:00"}, "comparisons": [{"name": "temperature/singleCell", "figure": "temperature", "computed": "Pipe (OpenQBMM)", "reference": "Single cell", "tolerance": 0.01, "rms": 0.004665634748226044, "largest": 0.007879025038194222, "points": 141, "referencePoints": 190, "verdict": "pass"}, {"name": "environmentTemperature/node0/singleCell0", "figure": "environmentTemperature", "computed": "Environment 0", "reference": "Environment 0, single cell", "tolerance": 0.01, "rms": 0.005062609400968542, "largest": 0.00854855025782486, "points": 141, "referencePoints": 190, "verdict": "pass"}, {"name": "environmentTemperature/node1/singleCell1", "figure": "environmentTemperature", "computed": "Environment 1", "reference": "Environment 1, single cell", "tolerance": 0.01, "rms": 0.003903561951883338, "largest": 0.008265450276189516, "points": 141, "referencePoints": 190, "verdict": "pass"}, {"name": "environmentTemperature/node2/singleCell2", "figure": "environmentTemperature", "computed": "Environment 2", "reference": "Environment 2, single cell", "tolerance": 0.02, "rms": 0.005949063503852578, "largest": 0.023804189966988576, "points": 141, "referencePoints": 190, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "temperature", "file": "figures/tutorials/mixingReactingFoam/plugFlowMethane/temperature.svg"}, {"name": "environmentTemperature", "file": "figures/tutorials/mixingReactingFoam/plugFlowMethane/environmentTemperature.svg"}, {"name": "velocity", "file": "figures/tutorials/mixingReactingFoam/plugFlowMethane/velocity.svg"}, {"name": "density", "file": "figures/tutorials/mixingReactingFoam/plugFlowMethane/density.svg"}], "status": "passed"}, {"path": "tutorials/mixingReactingFoam/twoStreamsFastReaction", "application": "mixingReactingFoam", "run": {"ran": true, "completed": true, "seconds": 63.36, "date": "2026-11-04T20:15:58+00:00"}, "comparisons": [{"name": "atomsOfA/entered", "figure": "atomsOfA", "computed": "OpenQBMM, $\\langle Y_A + Y_P/2\\rangle$", "reference": "Entered, $0.1\\langle\\xi\\rangle$", "tolerance": 1e-05, "rms": 7.364195630431268e-08, "largest": 9.567947355562615e-08, "points": 30, "referencePoints": 30, "verdict": "pass"}, {"name": "atomsOfB/entered", "figure": "atomsOfB", "computed": "OpenQBMM, $\\langle Y_B + Y_P/2\\rangle$", "reference": "Entered, $0.1(1 - \\langle\\xi\\rangle)$", "tolerance": 1e-05, "rms": 9.303104751499715e-07, "largest": 1.1882895587328296e-06, "points": 30, "referencePoints": 30, "verdict": "pass"}, {"name": "product/complete", "figure": "product", "computed": "OpenQBMM", "reference": "Complete reaction of the mean mixture", "tolerance": null, "rms": 0.07538485847747768, "largest": 0.12007153444836267, "points": 30, "referencePoints": 30, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "atomsOfA", "file": "figures/tutorials/mixingReactingFoam/twoStreamsFastReaction/atomsOfA.svg"}, {"name": "atomsOfB", "file": "figures/tutorials/mixingReactingFoam/twoStreamsFastReaction/atomsOfB.svg"}, {"name": "product", "file": "figures/tutorials/mixingReactingFoam/twoStreamsFastReaction/product.svg"}, {"name": "reactants", "file": "figures/tutorials/mixingReactingFoam/twoStreamsFastReaction/reactants.svg"}], "status": "passed"}, {"path": "tutorials/mixingReactingFoam/twoStreamsGQMOM", "application": "mixingReactingFoam", "run": {"ran": true, "completed": true, "seconds": 40.3, "date": "2026-11-04T20:15:39+00:00"}, "comparisons": [], "regression": {"status": "pass"}, "figures": [], "status": "passed"}, {"path": "tutorials/mixingReactingFoam/twoStreamsQMOM", "application": "mixingReactingFoam", "run": {"ran": true, "completed": true, "seconds": 15.0, "date": "2026-11-04T20:15:13+00:00"}, "comparisons": [], "regression": {"status": "pass"}, "figures": [], "status": "passed"}, {"path": "tutorials/pbeTransportFoam/mixingPopulationBalance", "application": "pbeTransportFoam", "run": {"ran": true, "completed": true, "seconds": 833.21, "date": "2026-10-12T22:11:35+00:00", "allrun": 0}, "comparisons": [], "regression": {"status": "pass"}, "figures": [], "status": "passed"}, {"path": "validation/oneWayCoupledVdfTransportFoam/spray1D/biModal_nonLinear", "application": "oneWayCoupledVdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 1812.71, "date": "2026-10-12T22:28:57+00:00", "allrun": 0}, "comparisons": [{"name": "totalMass/Fox2008", "figure": "totalMass", "computed": "OpenQBMM", "reference": "DQMOM without flux (Fox, 2008)", "tolerance": 0.02, "rms": 0.006856589874102387, "largest": 0.017073425210475317, "points": 21, "referencePoints": 22, "verdict": "pass"}, {"name": "totalMass/Fox2008Flux", "figure": "totalMass", "computed": "OpenQBMM", "reference": "DQMOM with flux (Fox, 2008)", "tolerance": 0.2, "rms": 0.07084701225530984, "largest": 0.12940758763289034, "points": 24, "referencePoints": 25, "verdict": "pass"}, {"name": "Ur/Fox2008", "figure": "Ur", "computed": "OpenQBMM", "reference": "DQMOM without flux (Fox, 2008)", "tolerance": 0.07, "rms": 0.030567974298249243, "largest": 0.05958547391656219, "points": 23, "referencePoints": 23, "verdict": "pass"}, {"name": "Ur/Fox2008Flux", "figure": "Ur", "computed": "OpenQBMM", "reference": "DQMOM with flux (Fox, 2008)", "tolerance": null, "rms": 0.45640310407038426, "largest": 0.7522398538809733, "points": 23, "referencePoints": 23, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "totalMass", "file": "figures/validation/oneWayCoupledVdfTransportFoam/spray1D/biModal_nonLinear/totalMass.svg"}, {"name": "Ur", "file": "figures/validation/oneWayCoupledVdfTransportFoam/spray1D/biModal_nonLinear/Ur.svg"}], "status": "passed"}, {"path": "validation/oneWayCoupledVdfTransportFoam/spray1D/monoModal_linear", "application": "oneWayCoupledVdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 2073.84, "date": "2026-10-12T22:33:19+00:00", "allrun": 0}, "comparisons": [{"name": "totalMass/Fox2008", "figure": "totalMass", "computed": "OpenQBMM", "reference": "DQMOM (Fox, 2008)", "tolerance": 0.02, "rms": 0.005498327897320003, "largest": 0.010619624148472432, "points": 21, "referencePoints": 21, "verdict": "pass"}, {"name": "Ur/Fox2008", "figure": "Ur", "computed": "OpenQBMM", "reference": "DQMOM (Fox, 2008)", "tolerance": 0.05, "rms": 0.023631054948361974, "largest": 0.049923659954609075, "points": 27, "referencePoints": 28, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "totalMass", "file": "figures/validation/oneWayCoupledVdfTransportFoam/spray1D/monoModal_linear/totalMass.svg"}, {"name": "Ur", "file": "figures/validation/oneWayCoupledVdfTransportFoam/spray1D/monoModal_linear/Ur.svg"}], "status": "passed"}, {"path": "validation/oneWayCoupledVdfTransportFoam/spray1D/monoModal_linear_coalescence", "application": "oneWayCoupledVdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 3923.86, "date": "2026-10-12T23:04:09+00:00", "allrun": 0}, "comparisons": [{"name": "totalMass/Fox2008", "figure": "totalMass", "computed": "OpenQBMM", "reference": "DQMOM (Fox, 2008)", "tolerance": null, "rms": 0.024698947522872713, "largest": 0.03568749922755728, "points": 20, "referencePoints": 22, "verdict": "report"}, {"name": "Ur/Fox2008", "figure": "Ur", "computed": "OpenQBMM", "reference": "DQMOM (Fox, 2008)", "tolerance": null, "rms": 0.14301819436571475, "largest": 0.1873545735471827, "points": 21, "referencePoints": 21, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "totalMass", "file": "figures/validation/oneWayCoupledVdfTransportFoam/spray1D/monoModal_linear_coalescence/totalMass.svg"}, {"name": "Ur", "file": "figures/validation/oneWayCoupledVdfTransportFoam/spray1D/monoModal_linear_coalescence/Ur.svg"}], "status": "passed"}, {"path": "validation/oneWayCoupledVdfTransportFoam/spray1D/monoModal_nonLinear", "application": "oneWayCoupledVdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 6005.85, "date": "2026-10-12T23:38:49+00:00", "allrun": 0}, "comparisons": [{"name": "totalMass/Fox2008", "figure": "totalMass", "computed": "OpenQBMM", "reference": "DQMOM without flux (Fox, 2008)", "tolerance": 0.04, "rms": 0.01235029342142078, "largest": 0.03378994527331306, "points": 18, "referencePoints": 19, "verdict": "pass"}, {"name": "totalMass/Fox2008Flux", "figure": "totalMass", "computed": "OpenQBMM", "reference": "DQMOM with flux (Fox, 2008)", "tolerance": 0.03, "rms": 0.013995359764315651, "largest": 0.032785267488189135, "points": 22, "referencePoints": 23, "verdict": "pass"}, {"name": "Ur/Fox2008", "figure": "Ur", "computed": "OpenQBMM", "reference": "DQMOM without flux (Fox, 2008)", "tolerance": 0.2, "rms": 0.04824011444390423, "largest": 0.07391795281783345, "points": 29, "referencePoints": 29, "verdict": "pass"}, {"name": "Ur/Fox2008Flux", "figure": "Ur", "computed": "OpenQBMM", "reference": "DQMOM with flux (Fox, 2008)", "tolerance": 0.2, "rms": 0.10465846455253612, "largest": 0.3034960124593832, "points": 21, "referencePoints": 24, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "totalMass", "file": "figures/validation/oneWayCoupledVdfTransportFoam/spray1D/monoModal_nonLinear/totalMass.svg"}, {"name": "Ur", "file": "figures/validation/oneWayCoupledVdfTransportFoam/spray1D/monoModal_nonLinear/Ur.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/GQMOM/condensationLage", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.06, "date": "2026-11-04T20:15:15+00:00"}, "comparisons": [], "regression": {"status": "pass"}, "figures": [], "status": "passed"}, {"path": "validation/pbeFoam/GQMOM/diffusionControlledGrowthMcGraw", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.01, "date": "2026-11-04T20:15:17+00:00"}, "comparisons": [], "regression": {"status": "pass"}, "figures": [], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaGQMOMGamma/case5", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.06, "date": "2026-11-04T20:15:19+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.02, "rms": 0.0012586281753796155, "largest": 0.006646447890395501, "points": 190000, "referencePoints": 200000, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.02, "rms": 0.005725001948106755, "largest": 0.02249054604838054, "points": 37, "referencePoints": 43, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaGQMOMGamma/case5/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaGQMOMGamma/case5Convergence", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 1.38, "date": "2026-11-04T20:15:24+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.02, "rms": 0.0013173517853942215, "largest": 0.00678796028078254, "points": 190000, "referencePoints": 200000, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.02, "rms": 0.005710650245107806, "largest": 0.022331748474424512, "points": 37, "referencePoints": 43, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaGQMOMGamma/case5Convergence/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaGQMOMGamma/case6", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.02, "date": "2026-11-04T20:15:27+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.02, "rms": 0.0029572387214904495, "largest": 0.013051032506288437, "points": 38001, "referencePoints": 40001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.02, "rms": 0.006755197811218143, "largest": 0.017952952538011577, "points": 23, "referencePoints": 26, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaGQMOMGamma/case6/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaGQMOMGamma/case7", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.07, "date": "2026-11-04T20:15:29+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.07, "rms": 0.03359518065064534, "largest": 0.11693849103639922, "points": 9001, "referencePoints": 10001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.04, "rms": 0.019794238144664383, "largest": 0.04456867424049387, "points": 17, "referencePoints": 36, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaGQMOMGamma/case7/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaGQMOMGamma/case8", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.01, "date": "2026-11-04T20:15:31+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.05, "rms": 0.03960257762632389, "largest": 0.07265125849933995, "points": 1950, "referencePoints": 2000, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.05, "rms": 0.03715870983397988, "largest": 0.05229337002531377, "points": 9, "referencePoints": 11, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaGQMOMGamma/case8/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaGQMOMGamma/case8Convergence", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 5.76, "date": "2026-11-04T20:15:39+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.03, "rms": 0.019384676186147, "largest": 0.09956994207847955, "points": 1950, "referencePoints": 2000, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.03, "rms": 0.01596767680558743, "largest": 0.04039808081840006, "points": 9, "referencePoints": 11, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaGQMOMGamma/case8Convergence/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaGQMOMGamma/case9", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.25, "date": "2026-11-04T20:15:43+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.03, "rms": 0.013013240096097204, "largest": 0.04769327999733483, "points": 90001, "referencePoints": 100001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.04, "rms": 0.015515076748280053, "largest": 0.04560527030996518, "points": 38, "referencePoints": 50, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaGQMOMGamma/case9/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaGQMOMLognormal/case5", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.05, "date": "2026-11-04T20:15:41+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.02, "rms": 0.0012682345762813944, "largest": 0.006655667078522534, "points": 190000, "referencePoints": 200000, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.02, "rms": 0.005733086053476763, "largest": 0.02248345858258499, "points": 37, "referencePoints": 43, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaGQMOMLognormal/case5/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaGQMOMLognormal/case6", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.01, "date": "2026-11-04T20:15:45+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.02, "rms": 0.002430068966642812, "largest": 0.010851921831800377, "points": 38001, "referencePoints": 40001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.02, "rms": 0.008550183607672365, "largest": 0.02217467112004327, "points": 23, "referencePoints": 26, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaGQMOMLognormal/case6/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaGQMOMLognormal/case7", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.07, "date": "2026-11-04T20:15:45+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.07, "rms": 0.030036920596175496, "largest": 0.10132736889719707, "points": 9001, "referencePoints": 10001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.04, "rms": 0.019730847033856583, "largest": 0.06214321204541566, "points": 17, "referencePoints": 36, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaGQMOMLognormal/case7/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaGQMOMLognormal/case8", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.02, "date": "2026-11-04T20:15:47+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.07, "rms": 0.03401288874316272, "largest": 0.07121477785603206, "points": 1950, "referencePoints": 2000, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.07, "rms": 0.03358704194724392, "largest": 0.046484729622706146, "points": 9, "referencePoints": 11, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaGQMOMLognormal/case8/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaGQMOMLognormal/case9", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.27, "date": "2026-11-04T20:15:49+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.03, "rms": 0.012394552730315932, "largest": 0.04521307141390817, "points": 90001, "referencePoints": 100001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.04, "rms": 0.015675021986520026, "largest": 0.0481824437090071, "points": 38, "referencePoints": 50, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaGQMOMLognormal/case9/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaQMOM/case5", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.05, "date": "2026-11-04T20:15:49+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "QMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.02, "rms": 0.001400183607206599, "largest": 0.006768902758586014, "points": 190000, "referencePoints": 200000, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "QMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.02, "rms": 0.005618758082143682, "largest": 0.022325805591704804, "points": 37, "referencePoints": 43, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaQMOM/case5/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaQMOM/case6", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.02, "date": "2026-11-04T20:15:51+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "QMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.02, "rms": 0.005380133435405213, "largest": 0.019483450000431533, "points": 38001, "referencePoints": 40001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "QMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.02, "rms": 0.0043056787529171, "largest": 0.010167198239426616, "points": 23, "referencePoints": 26, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaQMOM/case6/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaQMOM/case7", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.02, "date": "2026-11-04T20:15:53+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "QMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.09, "rms": 0.04190941513833878, "largest": 0.14748477127296422, "points": 9001, "referencePoints": 10001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "QMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.06, "rms": 0.029881001336313023, "largest": 0.06847941168405434, "points": 17, "referencePoints": 36, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaQMOM/case7/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaQMOM/case8", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.01, "date": "2026-11-04T20:15:53+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "QMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": null, "rms": 0.29479994905685863, "largest": 0.34095246828383363, "points": 1950, "referencePoints": 2000, "verdict": "report"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "QMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": null, "rms": 0.19127891053767518, "largest": 0.34945879451616724, "points": 9, "referencePoints": 11, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaQMOM/case8/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaQMOM/case9", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.04, "date": "2026-11-04T20:15:54+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "QMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.03, "rms": 0.012279374340503229, "largest": 0.046525921838951406, "points": 90001, "referencePoints": 100001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "QMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.04, "rms": 0.016196571297347518, "largest": 0.046439706200840404, "points": 38, "referencePoints": 50, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaQMOM/case9/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaRadau/case5", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.02, "date": "2026-11-04T20:15:55+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "QMOM Radau (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.02, "rms": 0.0074689295847351, "largest": 0.01115598134900505, "points": 190000, "referencePoints": 200000, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "QMOM Radau (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.02, "rms": 0.009146079259377387, "largest": 0.021411052592003852, "points": 37, "referencePoints": 43, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaRadau/case5/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaRadau/case6", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.01, "date": "2026-11-04T20:15:55+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "QMOM Radau (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.02, "rms": 0.009330495221698222, "largest": 0.04091065068701897, "points": 38001, "referencePoints": 40001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "QMOM Radau (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.05, "rms": 0.022760377830754294, "largest": 0.05711255454538543, "points": 23, "referencePoints": 26, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaRadau/case6/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaRadau/case7", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.01, "date": "2026-11-04T20:15:57+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "QMOM Radau (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.1, "rms": 0.04539728221537006, "largest": 0.11112343461185291, "points": 9001, "referencePoints": 10001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "QMOM Radau (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.2, "rms": 0.05404011448137981, "largest": 0.15534392313979228, "points": 17, "referencePoints": 36, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaRadau/case7/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaRadau/case8", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.01, "date": "2026-11-04T20:15:57+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "QMOM Radau (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": null, "rms": 0.2550272513646812, "largest": 0.3102198616496853, "points": 1950, "referencePoints": 2000, "verdict": "report"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "QMOM Radau (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": null, "rms": 0.1695450507576523, "largest": 0.3190253308654848, "points": 9, "referencePoints": 11, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaRadau/case8/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/madadiPassalacquaRadau/case9", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.02, "date": "2026-11-04T20:16:01+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "QMOM Radau (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.04, "rms": 0.019902476336946605, "largest": 0.07024988243042497, "points": 90001, "referencePoints": 100001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "QMOM Radau (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.03, "rms": 0.014913588962622756, "largest": 0.051160637934221626, "points": 38, "referencePoints": 50, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/madadiPassalacquaRadau/case9/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/momentConvergence/GQMOM", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.06, "date": "2026-11-04T20:15:59+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.02, "rms": 0.0012586281753796155, "largest": 0.006646447890395501, "points": 190000, "referencePoints": 200000, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "GQMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.02, "rms": 0.005725001948106755, "largest": 0.02249054604838054, "points": 37, "referencePoints": 43, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/momentConvergence/GQMOM/d43.svg"}], "status": "passed"}, {"path": "validation/pbeFoam/momentConvergence/QMOM", "application": "pbeFoam", "run": {"ran": true, "completed": true, "seconds": 0.05, "date": "2026-11-04T20:15:59+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "QMOM (OpenQBMM)", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.02, "rms": 0.001400183607206599, "largest": 0.006768902758586014, "points": 190000, "referencePoints": 200000, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "QMOM (OpenQBMM)", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.02, "rms": 0.005618758082143682, "largest": 0.022325805591704804, "points": 37, "referencePoints": 43, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/pbeFoam/momentConvergence/QMOM/d43.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/GPBE/case5", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 1.9, "date": "2026-11-04T20:23:15+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "OpenQBMM", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.02, "rms": 0.0013296227625493372, "largest": 0.006912094418751498, "points": 190000, "referencePoints": 200000, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "OpenQBMM", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.02, "rms": 0.005651912825383934, "largest": 0.02217732400048929, "points": 37, "referencePoints": 43, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/vdfTransportFoam/GPBE/case5/d43.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/GPBE/case6", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 3.27, "date": "2026-11-04T20:23:22+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "OpenQBMM", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.02, "rms": 0.004131837246192605, "largest": 0.012274740996633558, "points": 38001, "referencePoints": 40001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "OpenQBMM", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.02, "rms": 0.006778628678836392, "largest": 0.01932651391022056, "points": 23, "referencePoints": 26, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/vdfTransportFoam/GPBE/case6/d43.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/GPBE/case7", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 16.64, "date": "2026-11-04T20:23:41+00:00"}, "comparisons": [{"name": "d43/MadadiPassalacqua2015", "figure": "d43", "computed": "OpenQBMM", "reference": "Madadi and Passalacqua (2015)", "tolerance": 0.06, "rms": 0.028348441568712898, "largest": 0.0999469934511548, "points": 9001, "referencePoints": 10001, "verdict": "pass"}, {"name": "d43/Vanni2000", "figure": "d43", "computed": "OpenQBMM", "reference": "Rigorous solution (Vanni, 2000)", "tolerance": 0.05, "rms": 0.020627157759429745, "largest": 0.06351891640197006, "points": 17, "referencePoints": 36, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "d43", "file": "figures/validation/vdfTransportFoam/GPBE/case7/d43.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/bidisperseCooling", "application": null, "run": {"ran": false}, "comparisons": [{"name": "temperatureRatio/OpenQBMM_0_95/Enskog_0_95", "figure": "temperatureRatio", "computed": "OpenQBMM ($e = 0.95$)", "reference": "Enskog solution ($e = 0.95$)", "tolerance": 0.02, "rms": 0.0005677423098748712, "largest": 0.0011471556864926194, "points": 42, "referencePoints": 84, "verdict": "pass"}, {"name": "temperatureRatio/OpenQBMM_0_95/MD_0_95", "figure": "temperatureRatio", "computed": "OpenQBMM ($e = 0.95$)", "reference": "MD ($e = 0.95$)", "tolerance": 0.03, "rms": 0.010669012174516873, "largest": 0.011993889158181196, "points": 2, "referencePoints": 3, "verdict": "pass"}, {"name": "temperatureRatio/OpenQBMM_0_8/Enskog_0_8", "figure": "temperatureRatio", "computed": "OpenQBMM ($e = 0.8$)", "reference": "Enskog solution ($e = 0.8$)", "tolerance": 0.02, "rms": 0.009185558864210148, "largest": 0.011049300035334162, "points": 41, "referencePoints": 86, "verdict": "pass"}, {"name": "temperatureRatio/OpenQBMM_0_8/MD_0_8", "figure": "temperatureRatio", "computed": "OpenQBMM ($e = 0.8$)", "reference": "MD ($e = 0.8$)", "tolerance": 0.09, "rms": 0.04406294092512426, "largest": 0.04406294092512426, "points": 1, "referencePoints": 3, "verdict": "pass"}], "regression": {"status": "none"}, "figures": [{"name": "temperatureRatio", "file": "figures/validation/vdfTransportFoam/bidisperseCooling/temperatureRatio.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/bidisperseCooling/bidisperseGranularCooling_1_5__0_8", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 3.0, "date": "2026-11-04T20:23:53+00:00"}, "comparisons": [], "regression": {"status": "pass"}, "figures": [], "status": "passed"}, {"path": "validation/vdfTransportFoam/bidisperseCooling/bidisperseGranularCooling_1_5__0_95", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 2.94, "date": "2026-11-04T20:24:03+00:00"}, "comparisons": [], "regression": {"status": "pass"}, "figures": [], "status": "passed"}, {"path": "validation/vdfTransportFoam/bidisperseCooling/bidisperseGranularCooling_2_0__0_8", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 2.85, "date": "2026-11-04T20:24:13+00:00"}, "comparisons": [], "regression": {"status": "pass"}, "figures": [], "status": "passed"}, {"path": "validation/vdfTransportFoam/bidisperseCooling/bidisperseGranularCooling_2_0__0_95", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 3.06, "date": "2026-11-04T20:24:23+00:00"}, "comparisons": [], "regression": {"status": "pass"}, "figures": [], "status": "passed"}, {"path": "validation/vdfTransportFoam/bidisperseCooling/bidisperseGranularCooling_3_0__0_8", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 2.89, "date": "2026-11-04T20:24:33+00:00"}, "comparisons": [], "regression": {"status": "pass"}, "figures": [], "status": "passed"}, {"path": "validation/vdfTransportFoam/bidisperseCooling/bidisperseGranularCooling_3_0__0_95", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 3.0, "date": "2026-11-04T20:24:43+00:00"}, "comparisons": [], "regression": {"status": "pass"}, "figures": [], "status": "passed"}, {"path": "validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case1", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 9365.28, "date": "2026-10-13T00:34:02+00:00", "allrun": 0}, "comparisons": [{"name": "alpha/MD", "figure": "alpha", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.02, "rms": 0.010116188289083878, "largest": 0.020269730741181456, "points": 47, "referencePoints": 47, "verdict": "pass"}, {"name": "alpha/TP", "figure": "alpha", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.03, "rms": 0.010754421150263987, "largest": 0.018777731640076085, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "Theta/MD", "figure": "Theta", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.04, "rms": 0.020503752001402763, "largest": 0.04710816577468998, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "Theta/TP", "figure": "Theta", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.03, "rms": 0.012572721942796846, "largest": 0.022054565446499384, "points": 31, "referencePoints": 32, "verdict": "pass"}, {"name": "heatFlux/MD", "figure": "heatFlux", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": null, "rms": 0.7176520824189778, "largest": 0.7476780493419117, "points": 28, "referencePoints": 28, "verdict": "report"}, {"name": "heatFlux/TP", "figure": "heatFlux", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": null, "rms": 0.6538750844233563, "largest": 0.7020524771191802, "points": 96, "referencePoints": 96, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "alpha", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case1/alpha.svg"}, {"name": "Theta", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case1/Theta.svg"}, {"name": "heatFlux", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case1/heatFlux.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case2", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 8611.48, "date": "2026-10-13T00:21:28+00:00", "allrun": 0}, "comparisons": [{"name": "alpha/MD", "figure": "alpha", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.2, "rms": 0.0833789552004627, "largest": 0.16537821066707617, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "alpha/TP", "figure": "alpha", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.2, "rms": 0.07240091341797393, "largest": 0.14560980329135745, "points": 17, "referencePoints": 18, "verdict": "pass"}, {"name": "Theta/MD", "figure": "Theta", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": null, "rms": 0.30468323436857, "largest": 0.34045065209903985, "points": 28, "referencePoints": 28, "verdict": "report"}, {"name": "Theta/TP", "figure": "Theta", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": null, "rms": 0.21764743629685498, "largest": 0.2840230397364998, "points": 36, "referencePoints": 36, "verdict": "report"}, {"name": "heatFlux/MD", "figure": "heatFlux", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": null, "rms": 0.4543281261994451, "largest": 0.6978279813345741, "points": 29, "referencePoints": 29, "verdict": "report"}, {"name": "heatFlux/TP", "figure": "heatFlux", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": null, "rms": 0.4193210105152975, "largest": 0.7429631944564434, "points": 36, "referencePoints": 36, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "alpha", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case2/alpha.svg"}, {"name": "Theta", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case2/Theta.svg"}, {"name": "heatFlux", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case2/heatFlux.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case3", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 7500.32, "date": "2026-10-13T00:03:02+00:00", "allrun": 0}, "comparisons": [{"name": "alpha/MD", "figure": "alpha", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.06, "rms": 0.02824677250332197, "largest": 0.05669671855830824, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "alpha/TP", "figure": "alpha", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.04, "rms": 0.018596958318734157, "largest": 0.04279561850566656, "points": 34, "referencePoints": 34, "verdict": "pass"}, {"name": "Theta/MD", "figure": "Theta", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": null, "rms": 0.22118465657969782, "largest": 0.23214368383516956, "points": 28, "referencePoints": 28, "verdict": "report"}, {"name": "Theta/TP", "figure": "Theta", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": null, "rms": 0.2132509225760849, "largest": 0.23012826471234227, "points": 34, "referencePoints": 34, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "alpha", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case3/alpha.svg"}, {"name": "Theta", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case3/Theta.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case4", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 6857.38, "date": "2026-10-12T23:52:18+00:00", "allrun": 0}, "comparisons": [{"name": "alpha/MD", "figure": "alpha", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.03, "rms": 0.011784581707404162, "largest": 0.021328025870314463, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "alpha/TP", "figure": "alpha", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.1, "rms": 0.04656473879219006, "largest": 0.061257473504070334, "points": 32, "referencePoints": 32, "verdict": "pass"}, {"name": "Theta/MD", "figure": "Theta", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": null, "rms": 0.4444124903751043, "largest": 0.4607406092496076, "points": 27, "referencePoints": 27, "verdict": "report"}, {"name": "Theta/TP", "figure": "Theta", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": null, "rms": 0.4349890483925185, "largest": 0.4572375062487473, "points": 33, "referencePoints": 33, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "alpha", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case4/alpha.svg"}, {"name": "Theta", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case4/Theta.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case5", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 2021.1, "date": "2026-10-12T22:31:41+00:00", "allrun": 0}, "comparisons": [{"name": "alpha/MD", "figure": "alpha", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.1, "rms": 0.055267946313371334, "largest": 0.0918564696922156, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "alpha/TP", "figure": "alpha", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.07, "rms": 0.039456239484650504, "largest": 0.16396679283950735, "points": 33, "referencePoints": 34, "verdict": "pass"}, {"name": "Theta/MD", "figure": "Theta", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": null, "rms": 0.40159298959348855, "largest": 0.5357235878228963, "points": 28, "referencePoints": 28, "verdict": "report"}, {"name": "Theta/TP", "figure": "Theta", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": null, "rms": 0.41190793606632226, "largest": 0.49599302519080024, "points": 34, "referencePoints": 36, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "alpha", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case5/alpha.svg"}, {"name": "Theta", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM/case5/Theta.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case1", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 9626.89, "date": "2026-10-13T00:38:24+00:00", "allrun": 0}, "comparisons": [{"name": "alpha/MD", "figure": "alpha", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.04, "rms": 0.016274745878997545, "largest": 0.03461144784030329, "points": 47, "referencePoints": 47, "verdict": "pass"}, {"name": "alpha/TP", "figure": "alpha", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.02, "rms": 0.008270006833800279, "largest": 0.012582052304704529, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "Theta/MD", "figure": "Theta", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.05, "rms": 0.022727441618842548, "largest": 0.05134070042300234, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "Theta/TP", "figure": "Theta", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.03, "rms": 0.01501651887258228, "largest": 0.027995298438297542, "points": 31, "referencePoints": 32, "verdict": "pass"}, {"name": "heatFlux/MD", "figure": "heatFlux", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": null, "rms": 0.351242654561875, "largest": 0.3740067689381032, "points": 28, "referencePoints": 28, "verdict": "report"}, {"name": "heatFlux/TP", "figure": "heatFlux", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": null, "rms": 0.16426033279354493, "largest": 0.17026427311021397, "points": 96, "referencePoints": 96, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "alpha", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case1/alpha.svg"}, {"name": "Theta", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case1/Theta.svg"}, {"name": "heatFlux", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case1/heatFlux.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case2", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 9271.69, "date": "2026-10-13T00:32:28+00:00", "allrun": 0}, "comparisons": [{"name": "alpha/MD", "figure": "alpha", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.06, "rms": 0.02790668497866641, "largest": 0.057496637470769614, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "alpha/TP", "figure": "alpha", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.05, "rms": 0.0223684242123053, "largest": 0.06141161794779964, "points": 17, "referencePoints": 18, "verdict": "pass"}, {"name": "Theta/MD", "figure": "Theta", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.3, "rms": 0.12990118859612945, "largest": 0.185206178703358, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "Theta/TP", "figure": "Theta", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.2, "rms": 0.05877887836412242, "largest": 0.14407914930596655, "points": 36, "referencePoints": 36, "verdict": "pass"}, {"name": "heatFlux/MD", "figure": "heatFlux", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": null, "rms": 0.23106800543135686, "largest": 0.3026546920520878, "points": 29, "referencePoints": 29, "verdict": "report"}, {"name": "heatFlux/TP", "figure": "heatFlux", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.3, "rms": 0.14331401099332722, "largest": 0.1878434426612827, "points": 36, "referencePoints": 36, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "alpha", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case2/alpha.svg"}, {"name": "Theta", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case2/Theta.svg"}, {"name": "heatFlux", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case2/heatFlux.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case3", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 8537.86, "date": "2026-10-13T00:20:19+00:00", "allrun": 0}, "comparisons": [{"name": "alpha/MD", "figure": "alpha", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.06, "rms": 0.026836549136612087, "largest": 0.028002581106197875, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "alpha/TP", "figure": "alpha", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.02, "rms": 0.0019222000053172475, "largest": 0.005147123485346441, "points": 34, "referencePoints": 34, "verdict": "pass"}, {"name": "Theta/MD", "figure": "Theta", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.2, "rms": 0.05537483137755928, "largest": 0.061932266581928776, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "Theta/TP", "figure": "Theta", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.2, "rms": 0.055798773259928186, "largest": 0.06255647157005144, "points": 34, "referencePoints": 34, "verdict": "pass"}], "regression": {"status": "pass"}, "figures": [{"name": "alpha", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case3/alpha.svg"}, {"name": "Theta", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case3/Theta.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case4", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 8189.91, "date": "2026-10-13T00:14:31+00:00", "allrun": 0}, "comparisons": [{"name": "alpha/MD", "figure": "alpha", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.08, "rms": 0.027071514324607596, "largest": 0.06256603869876451, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "alpha/TP", "figure": "alpha", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.2, "rms": 0.052974900797661005, "largest": 0.10661088019391746, "points": 32, "referencePoints": 32, "verdict": "pass"}, {"name": "Theta/MD", "figure": "Theta", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": null, "rms": 0.16501615737592384, "largest": 0.207954473882644, "points": 27, "referencePoints": 27, "verdict": "report"}, {"name": "Theta/TP", "figure": "Theta", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": null, "rms": 0.17033470387239913, "largest": 0.20669346332719016, "points": 33, "referencePoints": 33, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "alpha", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case4/alpha.svg"}, {"name": "Theta", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case4/Theta.svg"}], "status": "passed"}, {"path": "validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case5", "application": "vdfTransportFoam", "run": {"ran": true, "completed": true, "seconds": 7818.45, "date": "2026-10-13T00:08:19+00:00", "allrun": 0}, "comparisons": [{"name": "alpha/MD", "figure": "alpha", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": 0.2, "rms": 0.056320888806275046, "largest": 0.08392212511696455, "points": 28, "referencePoints": 28, "verdict": "pass"}, {"name": "alpha/TP", "figure": "alpha", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": 0.06, "rms": 0.031591661584671936, "largest": 0.0943973431194915, "points": 33, "referencePoints": 34, "verdict": "pass"}, {"name": "Theta/MD", "figure": "Theta", "computed": "OpenQBMM", "reference": "MD (Galvin et al., 2007)", "tolerance": null, "rms": 0.25366317289851775, "largest": 0.4048497977320363, "points": 28, "referencePoints": 28, "verdict": "report"}, {"name": "Theta/TP", "figure": "Theta", "computed": "OpenQBMM", "reference": "Passalacqua et al. (2011)", "tolerance": null, "rms": 0.2802483471516537, "largest": 0.40818620014391743, "points": 35, "referencePoints": 36, "verdict": "report"}], "regression": {"status": "pass"}, "figures": [{"name": "alpha", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case5/alpha.svg"}, {"name": "Theta", "file": "figures/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOMPlus/case5/Theta.svg"}], "status": "passed"}], "tests": [{"name": "Test-Vandermonde", "directory": null, "passed": true, "note": ""}, {"name": "Test-GolubWelsch", "directory": null, "passed": true, "note": ""}, {"name": "Test-MappedList", "directory": null, "passed": true, "note": ""}, {"name": "Test-MappedPtrList", "directory": null, "passed": true, "note": ""}, {"name": "Test-UnivariateMomentSet", "directory": null, "passed": true, "note": ""}, {"name": "Test-MultivariateMomentSet", "directory": null, "passed": true, "note": ""}, {"name": "Test-UnivariateMomentInversion", "directory": "./momentInversions/univariate/univariateMomentInversion", "passed": true, "note": ""}, {"name": "Test-ExtendedMomentInversion", "directory": "./momentInversions/univariate/extendedMomentInversion", "passed": true, "note": ""}, {"name": "Test-CHyQMOMMomentInversion", "directory": "./momentInversions/multivariate/CHyQMOMMomentInversion", "passed": true, "note": ""}, {"name": "Test-monoKineticMomentInversion", "directory": "./momentInversions/multivariate/monoKineticMomentInversion", "passed": true, "note": ""}, {"name": "Test-ConditionalMeansMomentInversion", "directory": null, "passed": true, "note": ""}, {"name": "Test-sizeCHyQMOMMomentInversion", "directory": "./momentInversions/multivariate/sizeCHyQMOMMomentInversion", "passed": true, "note": ""}, {"name": "Test-TensorProductMomentInversion", "directory": "./momentInversions/multivariate/TensorProductMomentInversion", "passed": true, "note": ""}, {"name": "Test-ConditionalMomentInversion", "directory": "./momentInversions/multivariate/conditionalMomentInversion", "passed": true, "note": ""}, {"name": "Test-CHyQMOMDegenerate", "directory": null, "passed": true, "note": ""}, {"name": "Test-MomentAdvection", "directory": null, "passed": true, "note": ""}, {"name": "Test-UnivariateAdvection", "directory": "./momentAdvection/univariate/cases/firstOrderKinetic", "passed": true, "note": ""}, {"name": "Test-UnivariateAdvection", "directory": "./momentAdvection/univariate/cases/zeta", "passed": true, "note": "passed on rerun, 2026-10-16, at 6a44ff93 on another machine; the mirror check at Co 0.5 is sensitive to round-off"}, {"name": "Test-UnivariateAdvection", "directory": "./momentAdvection/univariate/cases/zetaZeroOne", "passed": true, "note": ""}, {"name": "Test-UnivariateAdvection", "directory": "./momentAdvection/univariate/cases/zetaSSPRK2", "passed": true, "note": ""}, {"name": "Test-VelocityAdvection", "directory": "./momentAdvection/velocity/cases/crossing", "passed": true, "note": ""}, {"name": "Test-VelocityAdvection", "directory": "./momentAdvection/velocity/cases/crossingVikas", "passed": true, "note": ""}, {"name": "Test-VelocityAdvection", "directory": "./momentAdvection/velocity/cases/thermalVikas", "passed": true, "note": ""}, {"name": "Test-VelocityAdvection", "directory": "./momentAdvection/velocity/cases/reflectiveElastic", "passed": true, "note": ""}, {"name": "Test-VelocityAdvection", "directory": "./momentAdvection/velocity/cases/reflectiveInelastic", "passed": true, "note": ""}, {"name": "Test-VelocityAdvection", "directory": "./momentAdvection/velocity/cases/fixedTemperature", "passed": true, "note": ""}, {"name": "Test-VelocityAdvection", "directory": "./momentAdvection/velocity/cases/noFlux", "passed": true, "note": ""}, {"name": "Test-VelocityAdvection", "directory": "./momentAdvection/velocity/cases/symmetry", "passed": true, "note": ""}, {"name": "Test-VelocityAdvection", "directory": "./momentAdvection/velocity/cases/outflow", "passed": true, "note": ""}, {"name": "Test-FluidVelocityAdvection", "directory": "./momentAdvection/fluidVelocity/case", "passed": true, "note": ""}, {"name": "Test-UnivariateQuadratureApproximation", "directory": "./univariateQuadratureApproximation/testCase", "passed": true, "note": ""}, {"name": "Test-PopulationBalanceSubModels", "directory": "./populationBalanceSubModels/testCase", "passed": true, "note": ""}, {"name": "Test-SizeVelocityNucleation", "directory": "./sizeVelocityNucleation/testCase", "passed": true, "note": ""}, {"name": "Test-RealizableOdeSolver", "directory": "./realizableOdeSolver/testCase", "passed": true, "note": ""}, {"name": "Test-RealizableOdeSolver", "directory": "./realizableOdeSolver/stiffCase", "passed": true, "note": ""}, {"name": "Test-RealizableOdeSolver", "directory": "./realizableOdeSolver/nucleationCase", "passed": true, "note": ""}, {"name": "Test-RealizableOdeSolver", "directory": "./realizableOdeSolver/floorCase", "passed": true, "note": "stopped as it should"}, {"name": "Test-MixingKernels", "directory": "./mixingKernels/IEM", "passed": true, "note": ""}, {"name": "Test-MixingKernels", "directory": "./mixingKernels/FokkerPlanck", "passed": true, "note": ""}, {"name": "Test-MixingKernels", "directory": "./mixingKernels/FokkerPlanckC3", "passed": true, "note": ""}, {"name": "Test-MixingKernels", "directory": "./mixingKernels/IEMkOmega", "passed": true, "note": ""}, {"name": "Test-MixingPopulationBalance", "directory": "./mixingPopulationBalance/case", "passed": true, "note": ""}, {"name": "Test-ConditionalMixing", "directory": "./mixingModels/conditionalMixing/case", "passed": true, "note": ""}, {"name": "Test-ConditionalReaction", "directory": "./mixingModels/conditionalReaction/isothermal", "passed": true, "note": ""}, {"name": "Test-ConditionalReaction", "directory": "./mixingModels/conditionalReaction/linearEnthalpy", "passed": true, "note": ""}, {"name": "Test-ConditionalReaction", "directory": "./mixingModels/conditionalReaction/mixing", "passed": true, "note": ""}, {"name": "Test-ConditionalReaction", "directory": "./mixingModels/conditionalReaction/conditionalEnthalpy", "passed": true, "note": ""}, {"name": "Test-MixtureFractionStreams", "directory": "./momentGeneration/mixtureFractionStreams/case", "passed": true, "note": ""}]}, "history": []};
+
+const statusText = { passed: "Passed", failed: "Failed", notRun: "Not run" };
+const statusTag = { passed: "tag tag-accent", failed: "tag tag-fail", notRun: "tag tag-outline" };
+
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs || {})) {
+    if (v === null || v === undefined) continue;
+    if (k === "class") node.className = v;
+    else if (k === "text") node.textContent = v;
+    else node.setAttribute(k, v);
+  }
+  for (const c of children) {
+    if (c === null || c === undefined) continue;
+    node.append(c instanceof Node ? c : document.createTextNode(String(c)));
+  }
+  return node;
+}
+
+function corners(node) {
+  for (const c of ["tl", "tr", "bl", "br"]) node.append(el("i", { class: "corner " + c }));
+  return node;
+}
+
+function fmt(x, digits = 3) {
+  if (x === null || x === undefined) return "–";
+  if (x === 0) return "0";
+  const a = Math.abs(x);
+  return a >= 1e-3 && a < 1e4 ? String(Number(x.toPrecision(digits))) : x.toExponential(digits - 1);
+}
+
+function duration(s) {
+  if (s === null || s === undefined) return "–";
+  if (s < 1) return "< 1 s";
+  if (s < 60) return Math.round(s) + " s";
+  if (s < 3600) return Math.round(s / 60) + " min";
+  return (s / 3600).toFixed(1) + " h";
+}
+
+// A label written in the mathematics of matplotlib, as plain text
+function plain(label) {
+  const symbols = { mu: "μ", Theta: "Θ", theta: "θ", alpha: "α", times: "×",
+                    langle: "⟨", rangle: "⟩", nu: "ν", sigma: "σ", rho: "ρ" };
+  return String(label).replace(/\$/g, "")
+    .replace(/\\([A-Za-z]+)/g, (m, w) => symbols[w] !== undefined ? symbols[w] : w)
+    .replace(/[{}]/g, "");
+}
+
+function day(iso) {
+  return iso ? iso.slice(0, 10) : "–";
+}
+
+// The solver or family a case belongs to: the directory under validation
+function groupOf(c) {
+  const parts = c.path.split("/");
+  return parts.length > 2 ? parts[1] : parts[0];
+}
+
+function caseName(c) {
+  const parts = c.path.split("/");
+  return parts.slice(parts.length > 2 ? 2 : 1).join("/");
+}
+
+// The rms of a comparison at the commit before the one shown
+function previousRms(history, c, x) {
+  if (history.length < 2) return undefined;
+  const prev = history[history.length - 2].cases[c.path];
+  return prev && prev.rms ? prev.rms[x.name] : undefined;
+}
+
+function plate(results) {
+  const s = results.summary;
+  const node = document.getElementById("plate");
+  const cell = (label, value, total, note, bad) => el("div", null,
+    el("div", { class: "label", text: label }),
+    el("div", { class: "value" }, value, el("small", { text: " / " + total })),
+    el("div", { class: bad ? "note bad" : "note", text: note }));
+
+  node.append(
+    cell("Cases passed", s.passed, s.cases,
+      s.failed ? s.failed + " failed" + (s.notRun ? ", " + s.notRun + " not run" : "")
+               : (s.notRun ? s.notRun + " not run" : "all ran and passed"), s.failed > 0),
+    cell("Comparisons within tolerance", s.comparisonsPassed, s.comparisonsJudged,
+      [s.comparisonsFailed ? s.comparisonsFailed + " outside" : null,
+       s.comparisonsNotRun ? s.comparisonsNotRun + " not run" : null,
+       s.comparisonsReported + " reported only"].filter(Boolean).join(" · "),
+      s.comparisonsFailed > 0),
+    cell("Baselines matched", s.baselinesPassed, s.baselines,
+      s.baselines - s.baselinesPassed - s.baselinesNotRun > 0
+        ? (s.baselines - s.baselinesPassed - s.baselinesNotRun) + " moved" + (s.baselinesNotRun ? " · " + s.baselinesNotRun + " not run" : "")
+        : (s.baselinesNotRun ? s.baselinesNotRun + " not run" : "all within their tolerance"),
+      s.baselines - s.baselinesPassed - s.baselinesNotRun > 0),
+    cell("Unit tests passed", s.testsPassed, s.tests,
+      s.tests ? (s.tests - s.testsPassed ? (s.tests - s.testsPassed) + " failed" : "all passed") : "not reported",
+      s.testsPassed < s.tests));
+}
+
+function kicker(results) {
+  const b = results.build;
+  const parts = ["Validation"];
+  if (b.shortCommit) parts.push("commit " + b.shortCommit + (b.modified ? " (modified)" : ""));
+  if (b.branch) parts.push(b.branch);
+  if (b.openfoam) parts.push("OpenFOAM " + b.openfoam);
+  parts.push(day(b.date));
+  document.getElementById("kicker").textContent = parts.join(" · ");
+}
+
+function comparisonCell(c) {
+  if (!c.comparisons.length) return el("span", { class: "label", text: "none" });
+  const dots = el("span", { class: "dots" });
+  if (c.status === "notRun") {
+    for (const x of c.comparisons) dots.append(el("span", { class: x.tolerance === null ? "report" : null, title: x.name + ": not run" }));
+    return el("span", null, dots, el("span", { class: "label", style: "margin-left:8px", text: "not run" }));
+  }
+  for (const x of c.comparisons) {
+    const cls = x.verdict === "pass" ? "pass" : x.verdict === "report" ? "report" : "fail";
+    dots.append(el("span", { class: cls, title: x.name + ": " + x.verdict }));
+  }
+  const judged = c.comparisons.filter(x => x.tolerance !== null);
+  const passed = judged.filter(x => x.verdict === "pass").length;
+  return el("span", null, dots, el("span", { class: "mono", style: "font-size:12px;margin-left:8px", text: passed + "/" + judged.length }));
+}
+
+function baselineCell(c) {
+  const r = c.regression;
+  if (r.status === "none") return el("span", { class: "label", text: "none" });
+  if (r.status === "pass") return el("span", { class: "mono", style: "font-size:12px", text: "matches" });
+  if (r.status === "notRun") return el("span", { class: "label", text: "not run" });
+  return el("span", { class: "tag tag-fail", text: r.status === "fail" ? "moved" : "error" });
+}
+
+function meter(x) {
+  const m = el("span", { class: "meter", title: "rms " + fmt(x.rms) + (x.tolerance !== null ? ", tolerance " + fmt(x.tolerance) : "") });
+  if (x.rms === undefined) return m;
+  // The tolerance sits at a quarter of the bar, which shows up to four times it
+  const scale = x.tolerance !== null ? x.tolerance * 4 : Math.max(x.rms * 1.25, 1e-300);
+  m.append(el("i", { class: x.verdict === "fail" ? "over" : null, style: "width:" + Math.min(100, 100 * x.rms / scale) + "%" }));
+  if (x.tolerance !== null) m.append(el("b"));
+  return m;
+}
+
+function detail(c, history) {
+  const box = el("div");
+
+  const facts = el("div", { class: "facts" });
+  const fact = (k, v) => facts.append(el("span", null, k + " ", el("b", { text: v })));
+  fact("Path", c.path);
+  if (c.application) fact("Solver", c.application);
+  if (c.run.ran) {
+    fact("Run time", duration(c.run.seconds));
+    fact("Last run", day(c.run.date));
+    if (!c.run.completed) fact("Run", "did not reach its end");
+  }
+  // A case merged into the report on its own ran at a commit of its own
+  if (c.ranAt && c.ranAt.shortCommit) {
+    fact("Run at", "commit " + c.ranAt.shortCommit + (c.ranAt.modified ? " (modified)" : ""));
+  }
+  box.append(facts);
+
+  if (c.error) box.append(el("p", { class: "note bad", text: c.error }));
+
+  if (c.figures.length) {
+    const figs = el("div", { class: "figures" });
+    for (const f of c.figures) {
+      figs.append(corners(el("figure", { class: "figure" },
+        el("img", { src: f.file, alt: f.name + " of " + c.path, loading: "lazy",
+                    class: f.themed ? null : "paper" }),
+        el("figcaption", { class: "label", text: f.name }))));
+    }
+    box.append(figs);
+  }
+
+  if (c.comparisons.length) {
+    const table = el("table", { class: "sub" });
+    table.append(el("thead", null, el("tr", null,
+      ...["Comparison", "Reference", "Tolerance", "rms", "", "Largest", "Change", "Verdict"].map(h => el("th", { text: h })))));
+    const body = el("tbody");
+    for (const x of c.comparisons) {
+      const prev = previousRms(history, c, x);
+      const change = prev !== undefined && x.rms !== undefined ? (x.rms - prev) : undefined;
+      body.append(el("tr", null,
+        el("td", { class: "num", text: x.name }),
+        el("td", { text: plain(x.reference) }),
+        el("td", { class: "num", text: x.tolerance === null ? "report" : fmt(x.tolerance) }),
+        el("td", { class: "num", text: fmt(x.rms) }),
+        el("td", null, meter(x)),
+        el("td", { class: "num", text: fmt(x.largest) }),
+        el("td", { class: "num", text: change === undefined ? "–" : change === 0 ? "none" : (change > 0 ? "+" : "") + fmt(change, 2) }),
+        el("td", null, x.verdict === "missing"
+          ? el("span", { class: "tag tag-fail", title: x.reason || "", text: "missing" })
+          : el("span", { class: x.verdict === "fail" ? "tag tag-fail" : x.verdict === "pass" ? "tag tag-accent" : "tag tag-neutral",
+                         text: x.verdict === "report" ? "reported" : x.verdict }))));
+    }
+    table.append(body);
+    box.append(el("div", { class: "scroll" }, table));
+  }
+
+  if (c.regression.problems) {
+    box.append(el("p", { class: "label", style: "margin-top:18px", text: "Moved from its baseline (" + c.regression.nProblems + ")" }));
+    const list = el("ul", { class: "problems" });
+    for (const p of c.regression.problems) list.append(el("li", { text: p }));
+    box.append(list);
+  }
+
+  return box;
+}
+
+function render(results, history) {
+  const groupsNode = document.getElementById("groups");
+  const show = document.querySelector("input[name=show]:checked").value;
+  const query = document.getElementById("search").value.trim().toLowerCase();
+
+  groupsNode.replaceChildren();
+
+  const groups = new Map();
+  for (const c of results.cases) {
+    if (show !== "all" && c.status !== show) continue;
+    if (query && !(c.path.toLowerCase().includes(query) || (c.application || "").toLowerCase().includes(query))) continue;
+    const g = groupOf(c);
+    if (!groups.has(g)) groups.set(g, []);
+    groups.get(g).push(c);
+  }
+
+  if (!groups.size) {
+    groupsNode.append(el("p", { class: "empty", text: "No case to show." }));
+    return;
+  }
+
+  for (const [g, cases] of groups) {
+    const section = el("section", { class: "group" });
+    const failed = cases.filter(c => c.status === "failed").length;
+    section.append(el("h2", { text: g }),
+      el("p", { class: "label", text: cases.length + (cases.length === 1 ? " case" : " cases") + (failed ? " · " + failed + " failed" : "") }));
+
+    const table = el("table", { class: "cases" });
+    table.append(el("colgroup", null, el("col"), el("col", { class: "status" }), el("col", { class: "cmp" }),
+      el("col", { class: "base wide" }), el("col", { class: "time wide" }), el("col", { class: "date wide" })));
+    table.append(el("thead", null, el("tr", null,
+      el("th", { text: "Case" }), el("th", { text: "Status" }), el("th", { text: "Comparisons" }),
+      el("th", { class: "wide", text: "Baseline" }), el("th", { class: "wide", text: "Run time" }), el("th", { class: "wide", text: "Last run" }))));
+    const body = el("tbody");
+
+    for (const c of cases) {
+      const row = el("tr", { class: "row", tabindex: "0", "aria-expanded": "false", "data-path": c.path },
+        el("td", { class: "name" }, el("span", { class: "chevron", text: "›" }), caseName(c)),
+        el("td", null, el("span", { class: statusTag[c.status], text: statusText[c.status] })),
+        el("td", null, comparisonCell(c)),
+        el("td", { class: "wide" }, baselineCell(c)),
+        el("td", { class: "num wide", text: c.run.ran ? duration(c.run.seconds) : "–" }),
+        el("td", { class: "num wide", text: c.run.ran ? day(c.run.date) : "–" }));
+      const more = el("tr", { class: "detail", hidden: "" }, el("td", { colspan: "6" }));
+      let built = false;
+      const toggle = () => {
+        if (!built) { more.firstChild.append(detail(c, history)); built = true; }
+        const open = more.hidden;
+        more.hidden = !open;
+        row.classList.toggle("open", open);
+        row.setAttribute("aria-expanded", String(open));
+      };
+      row.addEventListener("click", toggle);
+      row.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggle(); } });
+      body.append(row, more);
+    }
+
+    table.append(body);
+    section.append(table);
+    groupsNode.append(section);
+  }
+}
+
+function tests(results) {
+  const node = document.getElementById("tests");
+  const t = results.tests;
+  if (!t.length) {
+    document.getElementById("testsNote").textContent = "Not reported with these results";
+    return;
+  }
+  const failed = t.filter(x => !x.passed).length;
+  document.getElementById("testsNote").textContent =
+    t.length + " tests · " + (failed ? failed + " failed" : "all passed");
+  for (const x of t) {
+    node.append(el("div", { title: x.note || "" },
+      el("span", { class: "test" }, x.name, x.directory ? el("small", { text: x.directory.replace(/^\.\//, "") }) : null),
+      el("span", { class: x.passed ? "tag tag-accent" : "tag tag-fail", text: x.passed ? "passed" : "failed" })));
+  }
+}
+
+// A link to the page may name a case after its #, by its path from the top
+// of the sources: the case is opened and brought into view
+function openFromHash() {
+  const path = decodeURIComponent(location.hash.slice(1));
+  if (!path) return;
+  const row = [...document.querySelectorAll("tr.row")].find(r => r.dataset.path === path);
+  if (!row) return;
+  if (row.getAttribute("aria-expanded") !== "true") row.click();
+  row.scrollIntoView({ block: "start" });
+}
+
+function start(results, history) {
+  kicker(results);
+  plate(results);
+  tests(results);
+  render(results, history);
+  openFromHash();
+  window.addEventListener("hashchange", openFromHash);
+  for (const r of document.querySelectorAll("input[name=show]")) r.addEventListener("change", () => render(results, history));
+  document.getElementById("search").addEventListener("input", () => render(results, history));
+}
+
+if (DATA) {
+  start(DATA.results, DATA.history || []);
+} else {
+  Promise.all([
+    fetch("results.json").then(r => r.json()),
+    fetch("history.json").then(r => r.ok ? r.json() : []).catch(() => [])
+  ]).then(([results, history]) => start(results, history))
+    .catch(() => {
+      document.getElementById("groups").append(
+        el("p", { class: "empty", text: "The results could not be read." }));
+    });
+}
+</script>
+</body>
+</html>

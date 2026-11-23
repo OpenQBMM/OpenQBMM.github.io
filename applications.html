@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" href="favicon.ico" sizes="any">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<title>Applications · OpenQBMM</title>
+<link rel="stylesheet" href="industry.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root { --mono: ui-monospace, SFMono-Regular, Menlo, monospace; }
+  body { margin: 0; background: var(--color-bg); color: var(--color-text); font-family: var(--font-body); }
+  a { color: var(--color-accent-700); text-decoration: none; }
+  a:hover { color: var(--color-accent-900); }
+  .page { max-width: 1180px; margin: 0 auto; padding: 0 24px 80px; }
+  .hero { padding: 56px 0 24px; }
+  .hero .kicker, .app .kicker { margin: 0 0 14px; font-family: var(--mono); font-size: 11px; letter-spacing: .16em; text-transform: uppercase; color: var(--color-accent-700); }
+  h1 { margin: 0; font-family: var(--font-heading); font-weight: 700; font-size: clamp(40px, 5vw, 66px); line-height: .96; }
+  .lead { margin: 20px 0 0; max-width: 62ch; font-size: 17px; line-height: 1.55; color: var(--color-neutral-800); }
+  .toc { display: flex; flex-wrap: wrap; gap: 8px 22px; margin: 32px 0 0; padding: 16px 0; list-style: none; border-top: 1px solid var(--color-divider); border-bottom: 1px solid var(--color-divider); font-size: 14px; }
+  .app { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: 32px 48px; align-items: start; padding: 44px 0; border-bottom: 1px solid var(--color-divider); scroll-margin-top: 16px; }
+  .app h2 { margin: 0; font-family: var(--font-heading); font-size: 32px; }
+  .lead2 { margin: 10px 0 0; max-width: 62ch; font-size: 15px; line-height: 1.6; color: var(--color-neutral-800); }
+  .cases { margin: 18px 0 0; padding: 0; list-style: none; font-size: 14px; }
+  .cases li { padding: 8px 0; border-top: 1px solid var(--color-divider); display: flex; justify-content: space-between; gap: 16px; }
+  .cases .res { flex: none; font-family: var(--mono); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; padding-top: 2px; }
+  .fig { position: relative; margin: 0; border: 1px solid var(--color-divider); padding: 14px; }
+  .fig img { display: block; width: 100%; height: auto; }
+  .fig figcaption { margin-top: 8px; font-family: var(--mono); font-size: 11px; line-height: 1.5; color: var(--color-neutral-700); }
+  /* A figure drawn before the figures followed the theme keeps a light
+     ground in the dark theme; the page learns which from the results */
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .fig img.paper { background: #f2f2f3; padding: 6px; }
+  }
+  footer { margin-top: 80px; padding-top: 24px; border-top: 1px solid var(--color-divider); display: flex; justify-content: space-between; gap: 32px; flex-wrap: wrap; font-size: 13px; color: var(--color-neutral-700); }
+</style>
+</head>
+<body>
+<div class="page">
+  <div role="note" style="margin:12px 0 0;padding:8px 12px;border:1px solid var(--color-divider);font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:.08em;color:var(--color-accent-700)">PREVIEW of the site of OpenQBMM 18, not the release. The validation results are those of development runs.</div>
+
+  <header style="display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px 0;border-bottom:1px solid var(--color-divider);flex-wrap:wrap">
+    <a href="index.html" style="display:flex;align-items:baseline;gap:8px;color:var(--color-text)">
+      <svg viewBox="0 0 64 64" width="30" height="30" aria-hidden="true" style="align-self:center;flex:none"><line x1="6" y1="56.5" x2="58" y2="56.5" stroke="var(--color-accent-800)" stroke-width="2.4" stroke-linecap="round"/><g stroke="var(--color-accent-800)" stroke-width="3.2" stroke-linecap="round"><line x1="15" y1="56.5" x2="15" y2="38.35"/><line x1="26" y1="56.5" x2="26" y2="14.15"/><line x1="38" y1="56.5" x2="38" y2="18.92"/><line x1="50" y1="56.5" x2="50" y2="41.68"/></g><path d="M6 54 C 15 54, 17 14, 29 13 S 45 42, 58 51" fill="none" stroke="var(--color-accent-600)" stroke-width="3.2" stroke-linecap="round"/><g fill="var(--color-accent-800)"><circle cx="15" cy="38.35" r="4.2"/><circle cx="26" cy="14.15" r="4.2"/><circle cx="38" cy="18.92" r="4.2"/><circle cx="50" cy="41.68" r="4.2"/></g></svg><span style="font-family:var(--font-body);font-size:25px;line-height:1;color:var(--color-accent-800)"><span style="font-weight:400">Open</span><span style="font-weight:600">QBMM</span></span>
+      <span style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:10px;letter-spacing:.12em;color:var(--color-accent-700)">v18.0</span>
+    </a>
+    <nav style="display:flex;gap:22px;align-items:center;font-size:14px;flex-wrap:wrap">
+      <a href="index.html#capabilities">Features</a>
+      <a href="applications.html" style="color:var(--color-accent-900);border-bottom:2px solid var(--color-accent);padding-bottom:2px">Applications</a>
+      <a href="installation.html">Installation</a>
+      <a href="validation/index.html">Validation</a>
+      <a href="funding.html">Funding</a>
+      <a href="contributors.html">Contributors</a>
+      <a href="references.html">References</a>
+      <a class="btn btn-primary" href="https://github.com/OpenQBMM/OpenQBMM" style="font-size:13px;padding:7px 14px">GitHub</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <p class="kicker">Applications</p>
+    <h1>What OpenQBMM simulates</h1>
+    <p class="lead">Example applications of OpenQBMM. Click on the case name to reach the directory with the case sources; the Results link takes you to the case on the <a href="validation/index.html">validation page</a>.</p>
+    <ul class="toc"><li><a href="#size-distributions">Particle size distributions</a></li><li><a href="#mixing">Turbulent mixing and reacting flows</a></li><li><a href="#gas-particle">Granular and gas-particle flows</a></li><li><a href="#sprays">Sprays</a></li><li><a href="#compressible">High-speed compressible flows</a></li></ul>
+  </section>
+
+  <section class="app" id="size-distributions"><div class="text"><p class="kicker">pbeFoam · pbeTransportFoam</p><h2>Particle size distributions</h2><p class="lead2">Aggregation, breakage, growth and condensation of populations of particles, droplets or bubbles, solved for the moments of their size distribution with QMOM, GQMOM and their variants, in a single cell or transported in a flow.</p><ul class="cases"><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/tutorials/pbeFoam/aggregationBreakup">Aggregation and breakage</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/validation/pbeFoam/madadiPassalacquaGQMOMGamma">GQMOM against rigorous solutions</a> <a class="res" href="validation/index.html#validation/pbeFoam/madadiPassalacquaGQMOMGamma/case5">results</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/validation/pbeFoam/GQMOM/condensationLage">Condensation, after Lage</a> <a class="res" href="validation/index.html#validation/pbeFoam/GQMOM/condensationLage">results</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/validation/pbeFoam/GQMOM/diffusionControlledGrowthMcGraw">Diffusion-controlled growth, after McGraw</a> <a class="res" href="validation/index.html#validation/pbeFoam/GQMOM/diffusionControlledGrowthMcGraw">results</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/validation/pbeFoam/momentConvergence">Convergence with the number of moments</a> <a class="res" href="validation/index.html#validation/pbeFoam/momentConvergence/GQMOM">results</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/validation/pbeTransportFoam/serraTaylorCouette">A Taylor–Couette reactor</a></li></ul></div><figure class="fig"><img src="validation/figures/validation/pbeFoam/madadiPassalacquaGQMOMGamma/case5/d43.svg" alt="Mean diameter of a population under aggregation and breakage, GQMOM against the rigorous solution" loading="lazy" data-case="validation/pbeFoam/madadiPassalacquaGQMOMGamma/case5" data-figure="d43"><figcaption>Mean diameter of a population under aggregation and breakage, GQMOM against the rigorous solution</figcaption></figure></section>
+
+  <section class="app" id="mixing"><div class="text"><p class="kicker">mixingFoam · mixingReactingFoam · pbeTransportFoam</p><h2>Turbulent mixing and reacting flows</h2><p class="lead2">Streams that mix and react in turbulent flow, the composition and the enthalpy carried by the moments of the mixture fraction, with IEM and Fokker–Planck mixing models, and a population balance in each environment of the mixing.</p><ul class="cases"><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/tutorials/mixingFoam/mixingIEM">Mixing by interaction and exchange with the mean (IEM)</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/tutorials/mixingFoam/mixingFokkerPlanck">Fokker–Planck mixing</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/tutorials/mixingFoam/mixingReactionGQMOM">Mixing with a reaction, GQMOM</a> <a class="res" href="validation/index.html#tutorials/mixingFoam/mixingReactionGQMOM">results</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/tutorials/mixingReactingFoam/twoStreamsFastReaction">Two streams and a fast reaction</a> <a class="res" href="validation/index.html#tutorials/mixingReactingFoam/twoStreamsFastReaction">results</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/tutorials/mixingReactingFoam/plugFlowMethane">A methane plug-flow reactor</a> <a class="res" href="validation/index.html#tutorials/mixingReactingFoam/plugFlowMethane">results</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/tutorials/pbeTransportFoam/mixingPopulationBalance">Mixing and a population balance</a> <a class="res" href="validation/index.html#tutorials/pbeTransportFoam/mixingPopulationBalance">results</a></li></ul></div><figure class="fig"><img src="validation/figures/tutorials/mixingReactingFoam/twoStreamsFastReaction/product.svg" alt="The product of a fast reaction between two streams" loading="lazy" data-case="tutorials/mixingReactingFoam/twoStreamsFastReaction" data-figure="product"><figcaption>The product of a fast reaction between two streams</figcaption></figure></section>
+
+
+  <section class="app" id="gas-particle"><div class="text"><p class="kicker">vdfTransportFoam · diluteVdfTransportFoam · denseAGFoam</p><h2>Granular and gas-particle flows</h2><p class="lead2">Particles whose velocities are not those of the fluid: crossing jets, granular gases cooling by inelastic collisions, risers and fluidized beds, solved for the moments of the velocity distribution, or with an anisotropic Gaussian closure.</p><ul class="cases"><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/validation/vdfTransportFoam/jetCrossing">Crossing particle jets</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/validation/vdfTransportFoam/bidisperseCooling">Cooling of a bidisperse granular gas</a> <a class="res" href="validation/index.html#validation/vdfTransportFoam/bidisperseCooling">results</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/validation/vdfTransportFoam/monodisperseWallBoundedCooling_CHyQMOM">Wall-bounded granular cooling, CHyQMOM</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/validation/diluteVdfTransportFoam/riser">A riser</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/tutorials/diluteVdfTransportFoam/rotatingCylinder">Particles around a rotating cylinder</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/tutorials/denseAGFoam/fluidizedBed">A fluidized bed</a></li></ul></div><figure class="fig"><img src="validation/figures/validation/vdfTransportFoam/bidisperseCooling/temperatureRatio.svg" alt="The ratio of the granular temperatures of a bidisperse gas cooling by collisions" loading="lazy" data-case="validation/vdfTransportFoam/bidisperseCooling" data-figure="temperatureRatio"><figcaption>The ratio of the granular temperatures of a bidisperse gas cooling by collisions</figcaption></figure></section>
+
+  <section class="app" id="sprays"><div class="text"><p class="kicker">oneWayCoupledVdfTransportFoam</p><h2>Sprays</h2><p class="lead2">Droplets of many sizes and velocities carried by a gas, their sizes and velocities described jointly by moments, with coalescence.</p><ul class="cases"><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/validation/oneWayCoupledVdfTransportFoam/spray1D">One-dimensional sprays, with and without coalescence</a> <a class="res" href="validation/index.html#validation/oneWayCoupledVdfTransportFoam/spray1D/monoModal_linear_coalescence">results</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/validation/oneWayCoupledVdfTransportFoam/TaylorGreen">Particles in Taylor–Green vortices</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/validation/oneWayCoupledVdfTransportFoam/sizeTaylorGreen">Particles of many sizes in Taylor–Green vortices</a></li></ul></div><figure class="fig"><img src="validation/figures/validation/oneWayCoupledVdfTransportFoam/spray1D/monoModal_linear_coalescence/totalMass.svg" alt="The mass of a coalescing spray" loading="lazy" data-case="validation/oneWayCoupledVdfTransportFoam/spray1D/monoModal_linear_coalescence" data-figure="totalMass"><figcaption>The mass of a coalescing spray</figcaption></figure></section>
+
+  <section class="app" id="compressible"><div class="text"><p class="kicker">compressiblePbeTransportFoam</p><h2>High-speed compressible flows</h2><p class="lead2">A population balance in high-speed compressible flow, through shocks and expansions.</p><ul class="cases"><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/tutorials/compressiblePbeTransportFoam/forwardStep">A forward-facing step</a></li><li><a href="https://github.com/OpenQBMM/OpenQBMM/tree/development-openfoam.com/tutorials/compressiblePbeTransportFoam/twentyThreeDegreeWedge">A 23-degree wedge</a></li></ul></div></section>
+
+  <footer>
+    <p style="margin:0;max-width:62ch">OPENFOAM® is a registered trademark of OpenCFD Limited. OpenQBMM is not approved or endorsed by OpenCFD Limited.</p>
+    <p style="margin:0">Copyright © 2014–2026 OpenQBMM developers</p>
+  </footer>
+</div>
+<script>
+// Figures that follow the theme are told apart by the results of the
+// validation page; without them every figure keeps its light ground
+(function () {
+  const imgs = [...document.querySelectorAll(".fig img")];
+  imgs.forEach(i => i.classList.add("paper"));
+  fetch("validation/results.json").then(r => r.json()).then(res => {
+    const by = Object.fromEntries(res.cases.map(c => [c.path, c]));
+    for (const i of imgs) {
+      const c = by[i.dataset.case];
+      const f = c && c.figures.find(x => x.name === i.dataset.figure);
+      if (f && f.themed) i.classList.remove("paper");
+    }
+  }).catch(() => {});
+})();
+</script>
+</body>
+</html>
